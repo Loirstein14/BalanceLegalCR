@@ -17,10 +17,10 @@ require_once "controllers/core/Request.php";
 require_once "controllers/core/Response.php";
 
 /***--- Agregar todos los modelos*/
-
+require_once "models/ProductModel.php";
 
 /***--- Agregar todos los controladores*/
-
+require_once "controllers/ProductController.php";
 
 //Enrutador
 require_once "routes/RoutesController.php";
