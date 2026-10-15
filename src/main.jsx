@@ -7,6 +7,7 @@ import App from './App';
 import { Home } from './components/Home/Home';
 import { PageNotFound } from './components/Home/PageNotFound';
 import { CatalogProducts } from './components/Product/CatalogProducts';
+import { DetailProduct } from './components/Product/DetailProduct';
 
 const rutas = createBrowserRouter( 
   [     { 
@@ -19,6 +20,10 @@ const rutas = createBrowserRouter(
         {
           path: '/product',
           element: <CatalogProducts />
+        },
+        {
+          path: '/product/:id',
+          element: <DetailProduct />
         },
         {
           path: '*',
