@@ -18,9 +18,15 @@ require_once "controllers/core/Response.php";
 
 /***--- Agregar todos los modelos*/
 require_once "models/ProductModel.php";
+require_once "models/InvoiceItemModel.php";
+require_once "models/InvoiceModel.php";
+require_once "models/AppointmentAnswerModel.php";
+require_once "models/AppointmentModel.php";
 
 /***--- Agregar todos los controladores*/
 require_once "controllers/ProductController.php";
+require_once "controllers/InvoiceController.php";
+require_once "controllers/AppointmentController.php";
 
 //Enrutador
 require_once "routes/RoutesController.php";

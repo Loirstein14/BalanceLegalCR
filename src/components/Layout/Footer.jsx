@@ -21,12 +21,12 @@ export function Footer() {
       <Container> 
         <Grid container rowSpacing={1}> 
           <Grid size={12}> 
-            <Typography align="center" color="white" variant="subtitle1"> 
-              ISW-613 
+            <Typography align="center" variant="subtitle1" sx={{ color: 'common.white' }}> 
+              Balance Legal CR · ISW-613 
             </Typography> 
           </Grid> 
           <Grid size={12}> 
-            <Typography align="center" color="secondary.main" variant="body1"> 
+            <Typography align="center" variant="body1" sx={{ color: 'primaryLight.main' }}> 
               {`${new Date().getFullYear()}`} 
             </Typography> 
           </Grid> 
