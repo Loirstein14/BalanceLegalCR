@@ -1,17 +1,17 @@
 import { createTheme } from '@mui/material/styles';
-//Colores del logo de Balance Legal CR (azul de fondo y lavanda de la balanza)
+//Colores tomados del local de Balance Legal CR (azul de la pared) y la lavanda de la balanza del logo
 export const appTheme = createTheme({
   palette: {
     mode: 'light',
     primary: {
-      main: '#0001B4', //Azul del logo
+      main: '#1A3D6E', //Azul de la pared del local
     },
     secondary: {
-      main: '#1B1F6B', //Azul oscuro para encabezados
+      main: '#0F2A50', //Azul más oscuro para encabezados de tarjetas y tablas
     },
     primaryLight: {
-      main: '#ABB0F4', //Lavanda del logo
-      contrastText: '#0001B4',
+      main: '#ABB0F4', //Lavanda de la balanza del logo
+      contrastText: '#1A3D6E',
     },
   },
 });
