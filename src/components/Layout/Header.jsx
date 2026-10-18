@@ -9,8 +9,8 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Tooltip from '@mui/material/Tooltip';
 import MenuIcon from '@mui/icons-material/Menu';
-import BalanceIcon from '@mui/icons-material/Balance';
 import { Link } from 'react-router-dom';
+import logoBlanco from '../../assets/logo-balance-legal-blanco.png';
 
 //Lista enlaces menu principal
 const navItems = [
@@ -71,7 +71,7 @@ export default function Header() {
               component={Link}
               to="/"
               color="inherit"
-              startIcon={<BalanceIcon sx={{ color: 'primaryLight.main' }} />}
+              startIcon={<Box component="img" src={logoBlanco} alt="Logo Balance Legal CR" sx={{ width: 36, height: 36 }} />}
               sx={{ textTransform: 'none', mr: 2 }}
             >
               <Typography variant="h6" component="span" sx={{ fontWeight: 'bold' }}>
