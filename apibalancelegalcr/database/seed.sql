@@ -16,8 +16,10 @@ INSERT INTO business_settings (id, business_name, about_text) VALUES
   (1, 'Balance Legal CR',
    'Servicios legales y notariales con atención personalizada.');
 
-INSERT INTO branches (id, name, address, phone, email) VALUES
-  (1, 'Oficina Central', 'Dirección por definir', NULL, NULL);
+INSERT INTO branches (id, name, description, address, phone, email) VALUES
+  (1, 'Oficina Central',
+   'Oficina principal de Balance Legal. Atención en derecho civil, de familia, notarial y trámites registrales.',
+   'Dirección por definir', NULL, NULL);
 
 INSERT INTO users (id, role_id, branch_id, first_name, last_name, email, password_hash) VALUES
   (1, 3, NULL, 'Alejandra', 'Chavarría', 'admin@balancelegal.test',
@@ -29,10 +31,8 @@ INSERT INTO providers (id, user_id, branch_id, display_name, title) VALUES
   (1, 1, 1, 'Licda. Alejandra Chavarría', 'Abogada y Notaria'),
   (2, 2, 1, 'Lic. Adrián Pérez',          'Abogado');
 
--- Monday to Friday, 08:00 - 17:00 (lunch handled as a block if needed)
-INSERT INTO branch_schedules (branch_id, weekday, open_time, close_time) VALUES
-  (1, 1, '08:00', '17:00'), (1, 2, '08:00', '17:00'), (1, 3, '08:00', '17:00'),
-  (1, 4, '08:00', '17:00'), (1, 5, '08:00', '17:00');
+-- Schedules and blocks are date-based: they are loaded in seed_avance4.sql
+-- with dates relative to the day the script runs.
 
 INSERT INTO appointment_statuses (id, code, name, color_hex) VALUES
   (1, 'pending',     'Pendiente',    '#F59E0B'),
