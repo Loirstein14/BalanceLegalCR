@@ -13,9 +13,9 @@ class InvoiceItemModel
             $vSql = "SELECT it.id, it.description, it.quantity, it.unit_price, it.line_subtotal,
                             CASE WHEN it.service_id IS NOT NULL THEN 'Servicio' ELSE 'Producto' END AS item_type
                      FROM invoice_items it
-                     WHERE it.invoice_id = $idInvoice
+                     WHERE it.invoice_id = ?
                      ORDER BY it.id;";
-            $vResultado = $this->enlace->ExecuteSQL($vSql);
+            $vResultado = $this->enlace->ExecuteSQL($vSql, [$idInvoice]);
             return $vResultado;
         } catch (Exception $e) {
             handleException($e);

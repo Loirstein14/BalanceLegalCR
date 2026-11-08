@@ -47,8 +47,8 @@ class InvoiceModel
                        AND i.branch_id = b.id
                        AND i.status_id = s.id
                        AND bs.id = 1
-                       AND i.id = $id;";
-            $vResultado = $this->enlace->ExecuteSQL($vSql);
+                       AND i.id = ?;";
+            $vResultado = $this->enlace->ExecuteSQL($vSql, [$id]);
             if (!empty($vResultado)) {
                 $vResultado = $vResultado[0]; //Encabezado de la factura
                 //Líneas de detalle --items
