@@ -16,9 +16,13 @@ UPDATE branches
        email   = 'central@balancelegal.test'
  WHERE id = 1;
 
-INSERT INTO branches (id, name, address, phone, email) VALUES
-  (2, 'Sucursal Heredia',  'Heredia centro, 100 m norte del parque central', '2000-0002', 'heredia@balancelegal.test'),
-  (3, 'Sucursal San José', 'San José, Barrio Escalante, avenida 7',          '2000-0003', 'sanjose@balancelegal.test');
+INSERT INTO branches (id, name, description, address, phone, email) VALUES
+  (2, 'Sucursal Heredia',
+   'Atención en derecho laboral y de familia para la provincia de Heredia, con citas presenciales y virtuales.',
+   'Heredia centro, 100 m norte del parque central', '2000-0002', 'heredia@balancelegal.test'),
+  (3, 'Sucursal San José',
+   'Servicios notariales, constitución de sociedades y traspasos para empresas y particulares de la capital.',
+   'San José, Barrio Escalante, avenida 7',          '2000-0003', 'sanjose@balancelegal.test');
 
 -- ---------------------------------------------------------------------
 -- Users: id numbers for existing users, one manager per new branch,
@@ -53,14 +57,8 @@ INSERT INTO providers (id, user_id, branch_id, display_name, title) VALUES
   (4, 4, 3, 'Lic. Daniel Mora',     'Abogado y Notario');
 
 -- ---------------------------------------------------------------------
--- Schedules (Monday to Friday, 08:00 - 17:00) and services per branch
+-- Services per branch (schedules are date-based: see seed_avance4.sql)
 -- ---------------------------------------------------------------------
-INSERT INTO branch_schedules (branch_id, weekday, open_time, close_time) VALUES
-  (2, 1, '08:00', '17:00'), (2, 2, '08:00', '17:00'), (2, 3, '08:00', '17:00'),
-  (2, 4, '08:00', '17:00'), (2, 5, '08:00', '17:00'),
-  (3, 1, '08:00', '17:00'), (3, 2, '08:00', '17:00'), (3, 3, '08:00', '17:00'),
-  (3, 4, '08:00', '17:00'), (3, 5, '08:00', '17:00');
-
 INSERT INTO branch_services (branch_id, service_id) VALUES
   (2, 1), (2, 3),
   (3, 1), (3, 2), (3, 3);
