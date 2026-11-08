@@ -3,18 +3,21 @@
 require_once 'vendor/autoload.php';
 /*Encabezada de las solicitudes*/
 /*CORS*/
-header("Access-Control-Allow-Origin: * ");
-header("Access-Control-Allow-Headers: *");
-header("Access-Control-Allow-Methods: *");
+header("Access-Control-Allow-Origin: *");
+//Authorization se lista explícitamente: el comodín * no lo incluye
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
+header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header('Content-Type: application/json');
 
 /*--- Requerimientos Clases o librerías*/
 require_once "controllers/core/Config.php";
+require_once "controllers/core/ValidationException.php";
 require_once "controllers/core/HandleException.php";
 require_once "controllers/core/Logger.php";
 require_once "controllers/core/MySqlConnect.php";
 require_once "controllers/core/Request.php";
 require_once "controllers/core/Response.php";
+require_once "controllers/core/Validator.php";
 
 /***--- Agregar todos los modelos*/
 require_once "models/ProductModel.php";
