@@ -25,4 +25,15 @@ class Response
             http_response_code($this->status)
         );
     }
+
+    //Respuesta de error controlada: {status, message, errors}
+    public function error(int $code, string $message, array $errors = [])
+    {
+        http_response_code($code);
+        echo json_encode([
+            'status' => 'error',
+            'message' => $message,
+            'errors' => $errors
+        ]);
+    }
 }

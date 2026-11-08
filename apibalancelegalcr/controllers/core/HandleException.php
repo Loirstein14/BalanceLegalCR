@@ -6,6 +6,17 @@ set_exception_handler('handleException');
 set_error_handler('handleError');
 
 function handleException($exception) {
+    // Errores de validación o de reglas de negocio: respuesta controlada,
+    // con el mensaje y los errores por campo (no es un error del servidor)
+    if ($exception instanceof ValidationException) {
+        http_response_code($exception->getCode());
+        echo json_encode([
+            'status' => 'error',
+            'message' => $exception->getMessage(),
+            'errors' => $exception->getErrors()
+        ]);
+        exit;
+    }
     $log = new Logger();
     $error=[
         'status' => 'error',
@@ -31,4 +42,4 @@ function handleError($errno, $errstr, $errfile, $errline) {
     http_response_code(500);
     echo json_encode($error);
     exit;
-}
+}
