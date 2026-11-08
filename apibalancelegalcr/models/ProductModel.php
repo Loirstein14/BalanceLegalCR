@@ -28,8 +28,8 @@ class ProductModel
                             c.name AS category,
                             CASE p.delivery_format WHEN 'digital' THEN 'Digital' ELSE 'Físico' END AS delivery_format
                      FROM products p, product_categories c
-                     WHERE p.category_id = c.id AND p.id = $id;";
-            $vResultado = $this->enlace->ExecuteSQL($vSql);
+                     WHERE p.category_id = c.id AND p.id = ?;";
+            $vResultado = $this->enlace->ExecuteSQL($vSql, [$id]);
             if (!empty($vResultado)) {
                 return $vResultado[0]; //Un solo producto
             }
@@ -38,4 +38,4 @@ class ProductModel
             handleException($e);
         }
     }
-}
+}
