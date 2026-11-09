@@ -2,6 +2,8 @@ import React from 'react';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
+//Mensajes de validación de Yup en español (se cargan una sola vez)
+import './utils/yupLocale';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'; 
 import App from './App';
 import { Home } from './components/Home/Home';
