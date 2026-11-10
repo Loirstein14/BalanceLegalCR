@@ -2,6 +2,7 @@ import React from 'react';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import CardMedia from '@mui/material/CardMedia';
+import logo from '../../assets/logo.png';
 import CardContent from '@mui/material/CardContent';
 import CardActions from '@mui/material/CardActions';
 import Grid from '@mui/material/Grid';
@@ -41,7 +42,7 @@ export function ListCardProducts({ data }) {
               <CardMedia
                 component="img"
                 height="200"
-                image={`${BASE_URL}/${item.image_path}`}
+                image={item.image_path ? `${BASE_URL}/${item.image_path}` : logo} //Si no tiene imagen se pone el logo
                 alt={item.name}
               />
               {/* Precio */}
@@ -68,4 +69,4 @@ export function ListCardProducts({ data }) {
         ))}
     </Grid>
   );
-}
+}

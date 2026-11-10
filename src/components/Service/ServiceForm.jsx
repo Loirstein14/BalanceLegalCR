@@ -114,12 +114,12 @@ export function ServiceForm() {
         //Los datos sí se guardaron, solo falló la imagen: se manda a modificar para volver a intentar
         handleApiError(error, setError);
         toast.error('El servicio se guardó, pero la imagen no. Intente subirla de nuevo.');
-        navigate(`/service/update/${saved.id}`);
+        navigate(`/service/update/${saved.id}`, { replace: true });
         return;
       }
     }
     toast.success(isEdit ? 'Servicio modificado correctamente' : 'Servicio creado correctamente');
-    navigate(`/service/${saved.id}`);
+    navigate(`/service/${saved.id}`, { replace: true }); //replace: para que 'Regresar' no vuelva al form
   };
 
   if (!loaded) return <p>Cargando...</p>;
