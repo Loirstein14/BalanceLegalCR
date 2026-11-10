@@ -2,19 +2,12 @@
 
 use Psr\Log\LoggerInterface;
 
-/**
- * Acceso a la base de datos con mysqli.
- *
- * - Consultas preparadas: cada método recibe un arreglo opcional $params.
- *   En el SQL se usa ? en lugar de concatenar valores:
- *       $db->executeSQL("SELECT * FROM products WHERE id = ?", [$id]);
- *   Se ejecutan con mysqli::execute_query (PHP 8.2+), que prepara la
- *   sentencia, enlaza los valores y la ejecuta. Así se evita la inyección SQL.
- *
- * - Transacciones: transaction() abre UNA conexión, ejecuta todas las
- *   sentencias dentro de ella y hace COMMIT; si algo falla hace ROLLBACK.
- *   Fuera de una transacción cada método abre y cierra su propia conexión.
- */
+//Clase para conectarse a la BD con mysqli
+//Ojo: ahora los métodos reciben un arreglo de parámetros (opcional).
+//En el SQL se pone ? en vez de meter los valores directo, por ejemplo:
+//  $db->executeSQL("SELECT * FROM products WHERE id = ?", [$id]);
+//MySQL recibe los valores aparte, entonces no hay chance de inyección SQL.
+//Para guardar varias cosas juntas (todo o nada) se usa transaction().
 class MySqlConnect {
 	private $username;
 	private $password;
@@ -34,34 +27,28 @@ class MySqlConnect {
 		//Instancia Log
 		$this->log = new Logger();
 	}
-	/**
-	 * Establecer la conexión (si no hay una abierta)
-	 */
+	//Conectarse a la BD (si ya hay una conexión abierta se usa esa)
 	public function connect() {
 		if ($this->link !== null) {
 			return;
 		}
-		// Desde PHP 8.1 mysqli lanza mysqli_sql_exception ante cualquier error
+		//Con esto cualquier error de MySQL se tira como excepción
 		mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 		$this->link = mysqli_init();
-		// Enteros como int en JSON, igual con o sin parámetros (DECIMAL sigue siendo texto)
+		//Para que los id vengan como número y no como texto en el JSON
 		$this->link->options(MYSQLI_OPT_INT_AND_FLOAT_NATIVE, 1);
 		$this->link->real_connect($this->host, $this->username, $this->password, $this->dbname);
-		// Tildes y ñ correctas entre PHP y MySQL 8
+		//Para que las tildes y la ñ lleguen bien
 		$this->link->set_charset('utf8mb4');
 	}
-	/**
-	 * Cerrar la conexión, salvo que haya una transacción en curso
-	 */
+	//Cerrar la conexión (menos si estamos en medio de una transacción)
 	private function close() {
 		if (!$this->inTransaction && $this->link !== null) {
 			$this->link->close();
 			$this->link = null;
 		}
 	}
-	/**
-	 * Ejecuta la sentencia: preparada si hay parámetros, directa si no
-	 */
+	//Si trae parámetros la ejecuta como consulta preparada, si no, normal
 	private function run($sql, array $params) {
 		$this->connect();
 		if (empty($params)) {
@@ -69,10 +56,8 @@ class MySqlConnect {
 		}
 		return $this->link->execute_query($sql, array_values($params));
 	}
-	/**
-	 * Manejo de errores: dentro de una transacción se relanza la excepción
-	 * para que transaction() haga ROLLBACK; fuera de ella se responde el error.
-	 */
+	//Si estamos en una transacción se tira el error para que se haga el ROLLBACK,
+	//si no, se responde el error de una vez
 	private function fail(Throwable $e) {
 		if ($this->inTransaction) {
 			throw $e;
@@ -88,7 +73,7 @@ class MySqlConnect {
 	 * @return array|null lista de filas
 	 */
 	public function executeSQL($sql, $params = [], $resultType = "obj") {
-		// Compatibilidad: executeSQL($sql, "asoc")
+		//Por si se llama como antes: executeSQL($sql, "asoc")
 		if (is_string($params)) {
 			$resultType = $params;
 			$params = [];
@@ -138,16 +123,13 @@ class MySqlConnect {
 			$this->fail($e);
 		}
 	}
-	/**
-	 * Ejecutar varias sentencias como una sola unidad (todo o nada).
-	 *   $id = $db->transaction(function ($db) use ($data) {
-	 *       $id = $db->executeSQL_DML_last("INSERT ...", [...]);
-	 *       $db->executeSQL_DML("UPDATE ...", [...]);
-	 *       return $id;
-	 *   });
-	 * @param callable $callback recibe esta misma conexión
-	 * @return mixed lo que devuelva el callback
-	 */
+	//Ejecuta varias consultas como si fueran una sola (todo o nada).
+	//Si alguna se cae, se deshace todo con ROLLBACK. Se usa así:
+	//  $id = $db->transaction(function ($db) {
+	//      $id = $db->executeSQL_DML_last("INSERT ...", [...]);
+	//      $db->executeSQL_DML("UPDATE ...", [...]);
+	//      return $id;
+	//  });
 	public function transaction(callable $callback) {
 		try {
 			$this->connect();
@@ -164,7 +146,7 @@ class MySqlConnect {
 				$this->inTransaction = false;
 			}
 			$this->close();
-			// Las excepciones de negocio (validaciones) las maneja el controlador
+			//Los errores (de validación o de la BD) los maneja el controlador
 			throw $e;
 		}
 	}

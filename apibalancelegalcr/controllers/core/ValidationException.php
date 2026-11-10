@@ -1,10 +1,7 @@
 <?php
-/**
- * Error de validación o de regla de negocio.
- * handleException() la convierte en una respuesta JSON con el código HTTP
- * indicado (422 por defecto) y la lista de errores por campo, para que
- * React pueda mostrarlos junto a cada campo del formulario.
- */
+//Excepción para cuando los datos no pasan las validaciones o rompen una regla del negocio.
+//handleException() la agarra y responde un JSON con el código (422 por defecto)
+//y los errores por campo, así React los muestra debajo de cada campo.
 class ValidationException extends Exception
 {
     private array $errors;
