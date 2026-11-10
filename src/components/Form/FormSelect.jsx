@@ -5,11 +5,11 @@ import MenuItem from '@mui/material/MenuItem';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 
-//Lista desplegable conectada a react-hook-form.
-//options: [{ value, label }]. Con multiple=true el valor es un arreglo
-//(ej.: los encargados de una sucursal) y lo seleccionado se ve como chips.
+//Select de MUI conectado con react-hook-form.
+//options viene como [{ value, label }]. Con multiple=true el valor es un arreglo
+//(por ejemplo los encargados de una sucursal) y lo escogido se ve como chips
 export function FormSelect({ name, control, label, options, multiple = false, required = false, emptyText = 'No hay opciones disponibles', ...rest }) {
-  //Etiqueta de un valor seleccionado (para los chips)
+  //Para sacar el texto de cada valor escogido (para los chips)
   const labelOf = (value) => options.find((o) => o.value === value)?.label ?? value;
   return (
     <Controller

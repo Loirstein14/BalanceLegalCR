@@ -2,11 +2,11 @@ import PropTypes from 'prop-types';
 import { Controller } from 'react-hook-form';
 import TextField from '@mui/material/TextField';
 
-//Campo de texto de MUI conectado a react-hook-form.
-//Muestra el mensaje de error de Yup (o de la API) debajo del campo.
-//type: text | number | email | tel | date | time
+//TextField de MUI conectado con react-hook-form.
+//Si hay error (de Yup o de la API) lo pone debajo del campo.
+//type puede ser: text, number, email, tel, date o time
 export function FormTextField({ name, control, label, type = 'text', required = false, multiline = false, rows, htmlInput, ...rest }) {
-  //Las fechas y horas siempre muestran la etiqueta arriba (si no se monta sobre el dd/mm/aaaa)
+  //En fechas y horas la etiqueta va arriba siempre, si no se monta encima del dd/mm/aaaa
   const shrink = type === 'date' || type === 'time' ? { shrink: true } : undefined;
   return (
     <Controller
@@ -24,7 +24,7 @@ export function FormTextField({ name, control, label, type = 'text', required = 
           rows={rows}
           fullWidth
           error={Boolean(fieldState.error)}
-          //Espacio en blanco para que el formulario no "salte" al aparecer un error
+          //El espacio en blanco es para que el form no brinque cuando sale un error
           helperText={fieldState.error?.message ?? ' '}
           slotProps={{ inputLabel: shrink, htmlInput }}
           {...rest}

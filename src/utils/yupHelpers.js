@@ -1,7 +1,7 @@
 import * as yup from 'yup';
 
-//Número que, si el campo queda vacío, dice "es requerido" y no "no es un número".
-//(Un input type="number" vacío llega como '' y Yup lo convertiría en NaN)
+//Campo numérico que si queda vacío dice "es requerido" y no "no es un número"
+//(un input type="number" vacío llega como '' y Yup lo convierte en NaN)
 export const numberField = (label) =>
   yup
     .number()
@@ -9,14 +9,14 @@ export const numberField = (label) =>
     .typeError(`${label} debe ser un número`)
     .label(label);
 
-//Hoy a las 00:00 (para validar que una fecha no sea anterior a hoy)
+//Hoy a las 00:00, para validar que no pongan fechas pasadas
 export const today = () => {
   const d = new Date();
   d.setHours(0, 0, 0, 0);
   return d;
 };
 
-//Archivo de imagen: tipo y tamaño. required=true al crear, false al modificar
+//Imagen: revisa tipo y tamaño. required=true si es obligatoria
 const IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_IMAGE_MB = 2;
 export const imageField = (required = false) =>

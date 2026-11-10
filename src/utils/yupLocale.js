@@ -1,8 +1,8 @@
 import * as yup from 'yup';
 
-//Mensajes de Yup en español para toda la aplicación.
-//${label} es el nombre del campo definido con .label('Nombre') en cada esquema.
-//Se importa una sola vez en main.jsx.
+//Mensajes de Yup en español para toda la app, así no hay que escribirlos campo por campo.
+//${label} es el nombre que se le pone a cada campo con .label('Nombre') en el esquema.
+//Se importa una sola vez en main.jsx
 yup.setLocale({
   mixed: {
     required: '${label} es requerido',
