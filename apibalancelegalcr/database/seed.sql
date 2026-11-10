@@ -60,7 +60,7 @@ INSERT INTO products (category_id, name, description, price, delivery_format, de
 INSERT INTO services (id, name, description, price, duration_minutes, modality, requirements) VALUES
   (1, 'Consulta legal',           'Demo', 30000.00, 60, 'in_person', 'Cédula de identidad'),
   (2, 'Escrituras y traspasos',   'Demo', 80000.00, 60, 'in_person', 'Cédula y documentos del bien'),
-  (3, 'Consulta legal virtual',   'Demo', 25000.00, 45, 'virtual',   NULL);
+  (3, 'Consulta legal virtual',   'Demo', 25000.00, 60, 'virtual',   NULL);
 
 INSERT INTO branch_services (branch_id, service_id) VALUES (1, 1), (1, 2), (1, 3);
 
