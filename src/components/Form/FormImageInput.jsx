@@ -7,11 +7,11 @@ import FormHelperText from '@mui/material/FormHelperText';
 import Typography from '@mui/material/Typography';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 
-//Vista previa: la imagen nueva elegida o, si no hay, la imagen actual del registro
+//Vista previa: la imagen nueva que se eligió, o si no, la que ya tenía
 function ImagePreview({ file, currentImageUrl }) {
-  //URL temporal del archivo local elegido
+  //URL temporal para poder ver el archivo que se eligió
   const preview = useMemo(() => (file instanceof File ? URL.createObjectURL(file) : null), [file]);
-  //Liberar la URL temporal al cambiar de archivo o salir del formulario
+  //Se libera la URL cuando se cambia de archivo o se sale del form
   useEffect(() => () => preview && URL.revokeObjectURL(preview), [preview]);
 
   const src = preview ?? currentImageUrl;
@@ -30,8 +30,8 @@ ImagePreview.propTypes = {
   currentImageUrl: PropTypes.string,
 };
 
-//Selector de imagen conectado a react-hook-form.
-//El valor del campo es el objeto File elegido (o null si no se cambia la imagen).
+//Botón para escoger la imagen, conectado con react-hook-form.
+//El valor del campo es el File que se eligió (o null si no se cambia la imagen)
 export function FormImageInput({ name, control, label = 'Imagen', currentImageUrl }) {
   return (
     <Controller

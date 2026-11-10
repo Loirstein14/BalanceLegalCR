@@ -1,8 +1,8 @@
 import toast from 'react-hot-toast';
 
-//Muestra los errores que devuelve la API al guardar.
+//Para mostrar los errores que manda la API cuando se guarda algo.
 //La API responde { status, message, errors: { campo: mensaje } } (422 validación, 409 conflicto).
-//Con setError (de useForm) cada mensaje aparece debajo de su campo; además se muestra un toast.
+//Con setError (de useForm) cada error sale debajo de su campo y además se tira un toast
 export function handleApiError(error, setError) {
   const data = error?.response?.data;
   if (data?.errors && setError) {
