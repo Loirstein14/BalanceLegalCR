@@ -1,13 +1,10 @@
 <?php
-/**
- * Validaciones del lado del servidor (la API no confía en el formulario).
- * Uso:
- *   $v = new Validator($data);
- *   $v->required('name', 'Nombre')->maxLength('name', 120, 'Nombre')
- *     ->decimal('price', 0, 9999999, 'Precio');
- *   $v->validate();   // lanza ValidationException si hubo errores
- * Cada regla, salvo required, se salta si el campo viene vacío.
- */
+//Validaciones del lado de la API (no hay que confiar solo en el formulario de React,
+//cualquiera puede mandar datos con Postman). Se usa así:
+//  $v = new Validator($data);
+//  $v->required('name', 'Nombre')->maxLength('name', 120, 'Nombre');
+//  $v->validate(); //si hay errores tira una ValidationException
+//Ojo: menos required, las demás reglas no hacen nada si el campo viene vacío
 class Validator
 {
     private array $data;
@@ -31,7 +28,7 @@ class Validator
 
     public function addError(string $field, string $message): self
     {
-        // Solo el primer error de cada campo
+        //Nada más se guarda el primer error de cada campo
         if (!isset($this->errors[$field])) {
             $this->errors[$field] = $message;
         }
@@ -113,13 +110,14 @@ class Validator
     public function in(string $field, array $allowed, string $label): self
     {
         $value = $this->value($field);
-        if (!$this->isEmpty($value) && !in_array($value, $allowed, true)) {
+        //Se comparan como texto porque 60 y "60" son lo mismo
+        if (!$this->isEmpty($value) && !in_array((string) $value, array_map('strval', $allowed), true)) {
             $this->addError($field, "$label no tiene un valor permitido");
         }
         return $this;
     }
 
-    // Fecha con formato AAAA-MM-DD; con $notPast no puede ser anterior a hoy
+    //Fecha AAAA-MM-DD; con $notPast no deja poner fechas pasadas
     public function date(string $field, string $label, bool $notPast = false): self
     {
         $value = $this->value($field);
@@ -135,13 +133,13 @@ class Validator
         return $this;
     }
 
-    // Hora con formato HH:MM (24 h)
+    //Hora HH:MM en formato de 24 horas
     public function time(string $field, string $label): self
     {
         return $this->pattern($field, '/^([01]\d|2[0-3]):[0-5]\d(:00)?$/', "$label no es una hora válida (HH:MM)");
     }
 
-    // La hora final debe ser mayor que la inicial
+    //La hora de fin tiene que ser después de la de inicio
     public function timeRange(string $startField, string $endField, string $label): self
     {
         $start = $this->value($startField);

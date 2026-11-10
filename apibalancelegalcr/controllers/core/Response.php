@@ -26,7 +26,7 @@ class Response
         );
     }
 
-    //Respuesta de error controlada: {status, message, errors}
+    //Para responder un error con el formato {status, message, errors}
     public function error(int $code, string $message, array $errors = [])
     {
         http_response_code($code);

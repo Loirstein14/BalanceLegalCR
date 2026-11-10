@@ -6,8 +6,8 @@ set_exception_handler('handleException');
 set_error_handler('handleError');
 
 function handleException($exception) {
-    // Errores de validación o de reglas de negocio: respuesta controlada,
-    // con el mensaje y los errores por campo (no es un error del servidor)
+    //Si es un error de validación no es culpa del servidor:
+    //se responde con su código y los errores por campo
     if ($exception instanceof ValidationException) {
         http_response_code($exception->getCode());
         echo json_encode([
