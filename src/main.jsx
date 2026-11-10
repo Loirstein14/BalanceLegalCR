@@ -18,6 +18,7 @@ import { DetailAppointment } from './components/Appointment/DetailAppointment';
 import TableServices from './components/Service/TableServices';
 import { DetailService } from './components/Service/DetailService';
 import { ServiceForm } from './components/Service/ServiceForm';
+import { ProductForm } from './components/Product/ProductForm';
 
 const rutas = createBrowserRouter( 
   [     { 
@@ -38,6 +39,14 @@ const rutas = createBrowserRouter(
         {
           path: '/product-table',
           element: <TableProducts />
+        },
+        {
+          path: '/product/create',
+          element: <ProductForm />
+        },
+        {
+          path: '/product/update/:id',
+          element: <ProductForm />
         },
         {
           path: '/invoice',

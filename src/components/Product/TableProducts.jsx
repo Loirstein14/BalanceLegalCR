@@ -19,6 +19,9 @@ import Tooltip from '@mui/material/Tooltip';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import EditIcon from '@mui/icons-material/Edit';
+import AddIcon from '@mui/icons-material/Add';
+import Button from '@mui/material/Button';
 import { visuallyHidden } from '@mui/utils';
 import { Link } from 'react-router-dom';
 import ProductService from '../../services/ProductService';
@@ -95,7 +98,7 @@ function TableProductsHead(props) {
           </TableCell>
         ))}
         <TableCell align="center" sx={{ fontWeight: 'bold' }}>
-          Detalle
+          Acciones
         </TableCell>
       </TableRow>
     </TableHead>
@@ -173,6 +176,10 @@ export default function TableProducts() {
               <Typography sx={{ flex: '1 1 100%' }} variant="h6" component="div">
                 Mantenimiento de Productos
               </Typography>
+              {/* Botón para ir al formulario de crear */}
+              <Button component={Link} to="/product/create" variant="contained" startIcon={<AddIcon />} sx={{ flexShrink: 0 }}>
+                Nuevo producto
+              </Button>
             </Toolbar>
             <TableContainer>
               <Table sx={{ minWidth: 650 }} size={dense ? 'small' : 'medium'}>
@@ -199,6 +206,11 @@ export default function TableProducts() {
                               color="primary"
                             >
                               <VisibilityIcon />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="Modificar">
+                            <IconButton component={Link} to={`/product/update/${row.id}`} color="primary">
+                              <EditIcon />
                             </IconButton>
                           </Tooltip>
                         </TableCell>
