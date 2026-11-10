@@ -23,6 +23,7 @@ require_once "controllers/core/ImageUpload.php";
 /***--- Agregar todos los modelos*/
 require_once "models/ProductModel.php";
 require_once "models/ServiceModel.php";
+require_once "models/CategoryModel.php";
 require_once "models/InvoiceItemModel.php";
 require_once "models/InvoiceModel.php";
 require_once "models/AppointmentAnswerModel.php";
@@ -31,6 +32,7 @@ require_once "models/AppointmentModel.php";
 /***--- Agregar todos los controladores*/
 require_once "controllers/ProductController.php";
 require_once "controllers/ServiceController.php";
+require_once "controllers/CategoryController.php";
 require_once "controllers/InvoiceController.php";
 require_once "controllers/AppointmentController.php";
 
