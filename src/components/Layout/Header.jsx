@@ -26,6 +26,8 @@ const maintenanceItems = [
   { name: 'Productos', link: '/product-table' },
   { name: 'Servicios', link: '/service-table' },
   { name: 'Sucursales', link: '/branch-table' },
+  { name: 'Horarios', link: '/schedule-table' },
+  { name: 'Bloqueos', link: '/block-table' },
 ];
 
 export default function Header() {

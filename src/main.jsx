@@ -23,6 +23,14 @@ import TableBranches from './components/Branch/TableBranches';
 import { DetailBranch } from './components/Branch/DetailBranch';
 import { CreateBranch } from './components/Branch/CreateBranch';
 import { UpdateBranch } from './components/Branch/UpdateBranch';
+import TableSchedules from './components/Schedule/TableSchedules';
+import { DetailSchedule } from './components/Schedule/DetailSchedule';
+import { CreateSchedule } from './components/Schedule/CreateSchedule';
+import { UpdateSchedule } from './components/Schedule/UpdateSchedule';
+import TableBlocks from './components/Block/TableBlocks';
+import { DetailBlock } from './components/Block/DetailBlock';
+import { CreateBlock } from './components/Block/CreateBlock';
+import { UpdateBlock } from './components/Block/UpdateBlock';
 
 const rutas = createBrowserRouter( 
   [     { 
@@ -99,6 +107,38 @@ const rutas = createBrowserRouter(
         {
           path: '/branch/:id',
           element: <DetailBranch />
+        },
+        {
+          path: '/schedule-table',
+          element: <TableSchedules />
+        },
+        {
+          path: '/schedule/create',
+          element: <CreateSchedule />
+        },
+        {
+          path: '/schedule/update/:id',
+          element: <UpdateSchedule />
+        },
+        {
+          path: '/schedule/:id',
+          element: <DetailSchedule />
+        },
+        {
+          path: '/block-table',
+          element: <TableBlocks />
+        },
+        {
+          path: '/block/create',
+          element: <CreateBlock />
+        },
+        {
+          path: '/block/update/:id',
+          element: <UpdateBlock />
+        },
+        {
+          path: '/block/:id',
+          element: <DetailBlock />
         },
         {
           path: '*',
