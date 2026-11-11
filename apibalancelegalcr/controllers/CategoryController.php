@@ -1,14 +1,15 @@
 <?php
+//localhost/appbalancelegalcr/apibalancelegalcr/category
 class category
 {
-    //GET Listado de categorías de productos
-    //localhost/appbalancelegalcr/apibalancelegalcr/category
+    //GET listar categorías de productos
     public function index()
     {
         try {
             $response = new Response();
             $categoryM = new CategoryModel();
-            $response->toJSON($categoryM->all());
+            $result = $categoryM->all();
+            $response->toJSON($result);
         } catch (Exception $e) {
             handleException($e);
         }

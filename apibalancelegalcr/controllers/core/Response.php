@@ -25,15 +25,4 @@ class Response
             http_response_code($this->status)
         );
     }
-
-    //Para responder un error con el formato {status, message, errors}
-    public function error(int $code, string $message, array $errors = [])
-    {
-        http_response_code($code);
-        echo json_encode([
-            'status' => 'error',
-            'message' => $message,
-            'errors' => $errors
-        ]);
-    }
 }

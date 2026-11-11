@@ -6,17 +6,6 @@ set_exception_handler('handleException');
 set_error_handler('handleError');
 
 function handleException($exception) {
-    //Si es un error de validación no es culpa del servidor:
-    //se responde con su código y los errores por campo
-    if ($exception instanceof ValidationException) {
-        http_response_code($exception->getCode());
-        echo json_encode([
-            'status' => 'error',
-            'message' => $exception->getMessage(),
-            'errors' => $exception->getErrors()
-        ]);
-        exit;
-    }
     $log = new Logger();
     $error=[
         'status' => 'error',
