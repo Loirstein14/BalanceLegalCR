@@ -12,7 +12,6 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import EditIcon from '@mui/icons-material/Edit';
 import GavelIcon from '@mui/icons-material/Gavel';
 import ServiceService from '../../services/ServiceService';
-import { durationLabel, modalityLabel, formatPrice } from '../../utils/serviceOptions';
 
 //Una fila del detalle tipo "Etiqueta: valor"
 function InfoRow({ label, children }) {
@@ -80,14 +79,14 @@ export function DetailService() {
               {!data.is_active && <Chip label="Inactivo" size="small" />}
             </Box>
             <Typography variant="h5" color="secondary" gutterBottom>
-              {formatPrice(data.price)}
+              ₡{Number(data.price).toLocaleString('es-CR')}
             </Typography>
             <Divider sx={{ my: 2 }} />
             <Typography variant="body1" sx={{ mb: 2 }}>
               {data.description}
             </Typography>
-            <InfoRow label="Duración">{durationLabel(data.duration_minutes)}</InfoRow>
-            <InfoRow label="Modalidad">{modalityLabel(data.modality)}</InfoRow>
+            <InfoRow label="Duración">{data.duration_minutes / 60} {data.duration_minutes === 60 ? 'hora' : 'horas'}</InfoRow>
+            <InfoRow label="Modalidad">{data.modality_name}</InfoRow>
             <InfoRow label="Requisitos">{data.requirements || 'No requiere documentos'}</InfoRow>
             <InfoRow label="Sucursales">{data.branches || 'Aún no se ofrece en ninguna sucursal'}</InfoRow>
           </Grid>

@@ -24,7 +24,6 @@ import SearchIcon from '@mui/icons-material/Search';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import GavelIcon from '@mui/icons-material/Gavel';
 import ServiceService from '../../services/ServiceService';
-import { durationLabel, modalityLabel, formatPrice } from '../../utils/serviceOptions';
 
 //Tabla de mantenimiento de servicios: listar, buscar por nombre, ver detalle, crear y modificar
 export default function TableServices() {
@@ -109,9 +108,9 @@ export default function TableServices() {
                       {!row.is_active && <Chip label="Inactivo" size="small" />}
                     </Box>
                   </TableCell>
-                  <TableCell>{durationLabel(row.duration_minutes)}</TableCell>
-                  <TableCell>{modalityLabel(row.modality)}</TableCell>
-                  <TableCell align="right">{formatPrice(row.price)}</TableCell>
+                  <TableCell>{row.duration_minutes / 60} {row.duration_minutes === 60 ? 'hora' : 'horas'}</TableCell>
+                  <TableCell>{row.modality_name}</TableCell>
+                  <TableCell align="right">₡{Number(row.price).toLocaleString('es-CR')}</TableCell>
                   <TableCell align="center">
                     <Tooltip title="Ver detalle">
                       <IconButton component={Link} to={`/service/${row.id}`} color="primary">

@@ -2,8 +2,6 @@ import React from 'react';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
-//Mensajes de Yup en español (se cargan una sola vez para toda la app)
-import './utils/yupLocale';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'; 
 import App from './App';
 import { Home } from './components/Home/Home';
@@ -17,8 +15,14 @@ import { ListAppointments } from './components/Appointment/ListAppointments';
 import { DetailAppointment } from './components/Appointment/DetailAppointment';
 import TableServices from './components/Service/TableServices';
 import { DetailService } from './components/Service/DetailService';
-import { ServiceForm } from './components/Service/ServiceForm';
-import { ProductForm } from './components/Product/ProductForm';
+import { CreateService } from './components/Service/CreateService';
+import { UpdateService } from './components/Service/UpdateService';
+import { CreateProduct } from './components/Product/CreateProduct';
+import { UpdateProduct } from './components/Product/UpdateProduct';
+import TableBranches from './components/Branch/TableBranches';
+import { DetailBranch } from './components/Branch/DetailBranch';
+import { CreateBranch } from './components/Branch/CreateBranch';
+import { UpdateBranch } from './components/Branch/UpdateBranch';
 
 const rutas = createBrowserRouter( 
   [     { 
@@ -42,11 +46,11 @@ const rutas = createBrowserRouter(
         },
         {
           path: '/product/create',
-          element: <ProductForm />
+          element: <CreateProduct />
         },
         {
           path: '/product/update/:id',
-          element: <ProductForm />
+          element: <UpdateProduct />
         },
         {
           path: '/invoice',
@@ -70,15 +74,31 @@ const rutas = createBrowserRouter(
         },
         {
           path: '/service/create',
-          element: <ServiceForm />
+          element: <CreateService />
         },
         {
           path: '/service/update/:id',
-          element: <ServiceForm />
+          element: <UpdateService />
         },
         {
           path: '/service/:id',
           element: <DetailService />
+        },
+        {
+          path: '/branch-table',
+          element: <TableBranches />
+        },
+        {
+          path: '/branch/create',
+          element: <CreateBranch />
+        },
+        {
+          path: '/branch/update/:id',
+          element: <UpdateBranch />
+        },
+        {
+          path: '/branch/:id',
+          element: <DetailBranch />
         },
         {
           path: '*',

@@ -10,25 +10,20 @@ class ServiceService {
   }
   //Obtener un servicio por su id
   //localhost/appbalancelegalcr/apibalancelegalcr/service/1
-  getServiceById(serviceId) {
-    return axios.get(BASE_URL + '/' + serviceId);
+  getServiceById(ServiceId) {
+    return axios.get(BASE_URL + '/' + ServiceId);
   }
-  //Crear un servicio (POST, se manda en JSON)
-  createService(service) {
-    return axios.post(BASE_URL, service);
+  //Crear servicio
+  createService(Service) {
+    return axios.post(BASE_URL, JSON.stringify(Service));
   }
-  //Modificar un servicio (PUT, el id va dentro del objeto)
-  updateService(service) {
-    return axios.put(BASE_URL, service);
-  }
-  //Subir la imagen del servicio (POST con form-data: id e image)
-  //localhost/appbalancelegalcr/apibalancelegalcr/service/image
-  uploadImage(serviceId, file) {
-    const formData = new FormData();
-    formData.append('id', serviceId);
-    formData.append('image', file);
-    return axios.post(BASE_URL + '/image', formData);
+  //Actualizar servicio (el id va dentro del objeto)
+  updateService(Service) {
+    return axios({
+      method: 'put',
+      url: BASE_URL,
+      data: JSON.stringify(Service),
+    });
   }
 }
-
 export default new ServiceService();
