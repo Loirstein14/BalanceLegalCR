@@ -16,9 +16,13 @@ UPDATE branches
        email   = 'central@balancelegal.test'
  WHERE id = 1;
 
-INSERT INTO branches (id, name, address, phone, email) VALUES
-  (2, 'Sucursal Heredia',  'Heredia centro, 100 m norte del parque central', '2000-0002', 'heredia@balancelegal.test'),
-  (3, 'Sucursal San José', 'San José, Barrio Escalante, avenida 7',          '2000-0003', 'sanjose@balancelegal.test');
+INSERT INTO branches (id, name, description, address, phone, email) VALUES
+  (2, 'Sucursal Heredia',
+   'Atención en derecho laboral y de familia para la provincia de Heredia, con citas presenciales y virtuales.',
+   'Heredia centro, 100 m norte del parque central', '2000-0002', 'heredia@balancelegal.test'),
+  (3, 'Sucursal San José',
+   'Servicios notariales, constitución de sociedades y traspasos para empresas y particulares de la capital.',
+   'San José, Barrio Escalante, avenida 7',          '2000-0003', 'sanjose@balancelegal.test');
 
 -- ---------------------------------------------------------------------
 -- Users: id numbers for existing users, one manager per new branch,
@@ -53,14 +57,8 @@ INSERT INTO providers (id, user_id, branch_id, display_name, title) VALUES
   (4, 4, 3, 'Lic. Daniel Mora',     'Abogado y Notario');
 
 -- ---------------------------------------------------------------------
--- Schedules (Monday to Friday, 08:00 - 17:00) and services per branch
+-- Services per branch (schedules are date-based: see seed_avance4.sql)
 -- ---------------------------------------------------------------------
-INSERT INTO branch_schedules (branch_id, weekday, open_time, close_time) VALUES
-  (2, 1, '08:00', '17:00'), (2, 2, '08:00', '17:00'), (2, 3, '08:00', '17:00'),
-  (2, 4, '08:00', '17:00'), (2, 5, '08:00', '17:00'),
-  (3, 1, '08:00', '17:00'), (3, 2, '08:00', '17:00'), (3, 3, '08:00', '17:00'),
-  (3, 4, '08:00', '17:00'), (3, 5, '08:00', '17:00');
-
 INSERT INTO branch_services (branch_id, service_id) VALUES
   (2, 1), (2, 3),
   (3, 1), (3, 2), (3, 3);
@@ -114,16 +112,16 @@ VALUES
   -- branch 1 - Oficina Central
   (1,  5, 1, 1, 1, 4, '2026-10-05 09:00', '2026-10-05 10:00', 5, '2026-10-04 08:00', NULL, NULL, '2026-10-01 10:15'),
   (2,  6, 2, 1, 2, 4, '2026-10-06 14:00', '2026-10-06 15:00', 2, '2026-10-05 08:00', NULL, NULL, '2026-10-02 08:30'),
-  (3,  7, 1, 1, 3, 2, '2026-10-20 10:00', '2026-10-20 10:45', 7, NULL,               NULL, NULL, '2026-10-12 19:40'),
+  (3,  7, 1, 1, 3, 2, '2026-10-20 10:00', '2026-10-20 11:00', 7, NULL,               NULL, NULL, '2026-10-12 19:40'),
   (4,  8, 2, 1, 1, 1, '2026-10-22 15:00', '2026-10-22 16:00', 8, NULL,               NULL, NULL, '2026-10-14 11:05'),
   -- branch 2 - Sucursal Heredia
   (5,  9, 3, 2, 1, 4, '2026-10-07 08:00', '2026-10-07 09:00', 9, '2026-10-06 08:00', NULL, NULL, '2026-10-03 16:20'),
-  (6,  5, 3, 2, 3, 5, '2026-10-13 11:00', '2026-10-13 11:45', 5, NULL, '2026-10-11 09:00', 'El cliente indicó que no puede asistir.', '2026-10-08 13:10'),
+  (6,  5, 3, 2, 3, 5, '2026-10-13 11:00', '2026-10-13 12:00', 5, NULL, '2026-10-11 09:00', 'El cliente indicó que no puede asistir.', '2026-10-08 13:10'),
   (7,  6, 3, 2, 1, 3, '2026-10-21 13:00', '2026-10-21 14:00', 3, NULL,               NULL, NULL, '2026-10-09 10:45'),
   -- branch 3 - Sucursal San José
   (8,  7, 4, 3, 2, 4, '2026-10-08 10:00', '2026-10-08 11:00', 4, '2026-10-07 08:00', NULL, NULL, '2026-10-04 09:30'),
   (9,  8, 4, 3, 1, 6, '2026-10-09 16:00', '2026-10-09 17:00', 8, '2026-10-08 08:00', NULL, NULL, '2026-10-05 15:00'),
-  (10, 9, 4, 3, 3, 1, '2026-10-23 09:00', '2026-10-23 09:45', 9, NULL,               NULL, NULL, '2026-10-14 17:25');
+  (10, 9, 4, 3, 3, 1, '2026-10-23 09:00', '2026-10-23 10:00', 9, NULL,               NULL, NULL, '2026-10-14 17:25');
 
 -- ---------------------------------------------------------------------
 -- Answers to the 3 booking questions for every appointment

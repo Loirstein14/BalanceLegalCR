@@ -13,6 +13,17 @@ class ProductService {
   getProductById(ProductId) {
     return axios.get(BASE_URL + '/' + ProductId);
   }
+  //Crear producto
+  createProduct(Product) {
+    return axios.post(BASE_URL, JSON.stringify(Product));
+  }
+  //Actualizar producto (el id va dentro del objeto)
+  updateProduct(Product) {
+    return axios({
+      method: 'put',
+      url: BASE_URL,
+      data: JSON.stringify(Product),
+    });
+  }
 }
-
 export default new ProductService();

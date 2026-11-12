@@ -9,15 +9,25 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Tooltip from '@mui/material/Tooltip';
 import MenuIcon from '@mui/icons-material/Menu';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ListSubheader from '@mui/material/ListSubheader';
 import { Link } from 'react-router-dom';
 import logoBlanco from '../../assets/logo-balance-legal-blanco.png';
 
 //Lista enlaces menu principal
 const navItems = [
   { name: 'Productos', link: '/product' }, //Catálogo de productos (cards)
-  { name: 'Mantenimiento Productos', link: '/product-table' }, //Tabla de productos
   { name: 'Facturas', link: '/invoice' }, //Historial de facturas
   { name: 'Reservas', link: '/appointment' }, //Historial de reservas del encargado
+];
+
+//Submenú de mantenimientos (las tablas para listar, crear y modificar)
+const maintenanceItems = [
+  { name: 'Productos', link: '/product-table' },
+  { name: 'Servicios', link: '/service-table' },
+  { name: 'Sucursales', link: '/branch-table' },
+  { name: 'Horarios', link: '/schedule-table' },
+  { name: 'Bloqueos', link: '/block-table' },
 ];
 
 export default function Header() {
@@ -31,6 +41,12 @@ export default function Header() {
   //Cerrado menu principal
   const handleClosePrincipalMenu = () => {
     setAnchorElPrincipal(null);
+  };
+
+  //Abrir y cerrar el submenú de mantenimientos (pantallas grandes)
+  const [anchorElMaintenance, setAnchorElMaintenance] = React.useState(null);
+  const handleCloseMaintenanceMenu = () => {
+    setAnchorElMaintenance(null);
   };
 
   return (
@@ -63,6 +79,12 @@ export default function Header() {
                 <Typography sx={{ textAlign: 'center' }}>{item.name}</Typography>
               </MenuItem>
             ))}
+            <ListSubheader>Mantenimientos</ListSubheader>
+            {maintenanceItems.map((item) => (
+              <MenuItem key={item.link} component={Link} to={item.link} onClick={handleClosePrincipalMenu}>
+                <Typography sx={{ textAlign: 'center' }}>{item.name}</Typography>
+              </MenuItem>
+            ))}
           </Menu>
 
           {/* Enlace página inicio */}
@@ -87,6 +109,30 @@ export default function Header() {
                 {item.name}
               </Button>
             ))}
+            {/* Submenú de mantenimientos */}
+            <Button
+              color="inherit"
+              endIcon={<ArrowDropDownIcon />}
+              aria-controls="menu-maintenance"
+              aria-haspopup="true"
+              onClick={(event) => setAnchorElMaintenance(event.currentTarget)}
+            >
+              Mantenimientos
+            </Button>
+            <Menu
+              id="menu-maintenance"
+              anchorEl={anchorElMaintenance}
+              open={Boolean(anchorElMaintenance)}
+              onClose={handleCloseMaintenanceMenu}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+              transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+            >
+              {maintenanceItems.map((item) => (
+                <MenuItem key={item.link} component={Link} to={item.link} onClick={handleCloseMaintenanceMenu}>
+                  {item.name}
+                </MenuItem>
+              ))}
+            </Menu>
           </Box>
         </Toolbar>
       </AppBar>

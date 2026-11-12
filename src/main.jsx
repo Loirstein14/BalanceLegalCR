@@ -13,6 +13,24 @@ import TableInvoices from './components/Invoice/TableInvoices';
 import { DetailInvoice } from './components/Invoice/DetailInvoice';
 import { ListAppointments } from './components/Appointment/ListAppointments';
 import { DetailAppointment } from './components/Appointment/DetailAppointment';
+import TableServices from './components/Service/TableServices';
+import { DetailService } from './components/Service/DetailService';
+import { CreateService } from './components/Service/CreateService';
+import { UpdateService } from './components/Service/UpdateService';
+import { CreateProduct } from './components/Product/CreateProduct';
+import { UpdateProduct } from './components/Product/UpdateProduct';
+import TableBranches from './components/Branch/TableBranches';
+import { DetailBranch } from './components/Branch/DetailBranch';
+import { CreateBranch } from './components/Branch/CreateBranch';
+import { UpdateBranch } from './components/Branch/UpdateBranch';
+import TableSchedules from './components/Schedule/TableSchedules';
+import { DetailSchedule } from './components/Schedule/DetailSchedule';
+import { CreateSchedule } from './components/Schedule/CreateSchedule';
+import { UpdateSchedule } from './components/Schedule/UpdateSchedule';
+import TableBlocks from './components/Block/TableBlocks';
+import { DetailBlock } from './components/Block/DetailBlock';
+import { CreateBlock } from './components/Block/CreateBlock';
+import { UpdateBlock } from './components/Block/UpdateBlock';
 
 const rutas = createBrowserRouter( 
   [     { 
@@ -35,6 +53,14 @@ const rutas = createBrowserRouter(
           element: <TableProducts />
         },
         {
+          path: '/product/create',
+          element: <CreateProduct />
+        },
+        {
+          path: '/product/update/:id',
+          element: <UpdateProduct />
+        },
+        {
           path: '/invoice',
           element: <TableInvoices />
         },
@@ -49,6 +75,70 @@ const rutas = createBrowserRouter(
         {
           path: '/appointment/:id',
           element: <DetailAppointment />
+        },
+        {
+          path: '/service-table',
+          element: <TableServices />
+        },
+        {
+          path: '/service/create',
+          element: <CreateService />
+        },
+        {
+          path: '/service/update/:id',
+          element: <UpdateService />
+        },
+        {
+          path: '/service/:id',
+          element: <DetailService />
+        },
+        {
+          path: '/branch-table',
+          element: <TableBranches />
+        },
+        {
+          path: '/branch/create',
+          element: <CreateBranch />
+        },
+        {
+          path: '/branch/update/:id',
+          element: <UpdateBranch />
+        },
+        {
+          path: '/branch/:id',
+          element: <DetailBranch />
+        },
+        {
+          path: '/schedule-table',
+          element: <TableSchedules />
+        },
+        {
+          path: '/schedule/create',
+          element: <CreateSchedule />
+        },
+        {
+          path: '/schedule/update/:id',
+          element: <UpdateSchedule />
+        },
+        {
+          path: '/schedule/:id',
+          element: <DetailSchedule />
+        },
+        {
+          path: '/block-table',
+          element: <TableBlocks />
+        },
+        {
+          path: '/block/create',
+          element: <CreateBlock />
+        },
+        {
+          path: '/block/update/:id',
+          element: <UpdateBlock />
+        },
+        {
+          path: '/block/:id',
+          element: <DetailBlock />
         },
         {
           path: '*',

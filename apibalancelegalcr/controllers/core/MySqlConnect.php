@@ -33,17 +33,36 @@ class MySqlConnect {
 		}
 	}
 	/**
+	 * Lo único que le cambiamos a la clase del profe: los métodos reciben
+	 * un arreglo de parámetros opcional. En el SQL se pone ? donde va cada valor:
+	 *   $this->enlace->executeSQL("SELECT * FROM products WHERE id = ?", [$id]);
+	 * Así MySQL recibe los valores aparte del SQL (consulta preparada) y no hay
+	 * chance de inyección SQL, ni se cae si un nombre trae un apóstrofo.
+	 * Todas las consultas se ejecutan así (aunque no lleven ?), para que los
+	 * números siempre lleguen como número y no como texto.
+	 */
+	private function ejecutar($sql, $params) {
+		return $this->link->execute_query ( $sql, empty($params) ? null : array_values($params) );
+	}
+	/**
 	 * Ejecutar una setencia SQL tipo SELECT
-	 * @param $sql - string sentencia SQL
+	 * @param $sql - string sentencia SQL (con ? para los valores)
+	 * @param $params - array valores que van en los ?, en orden
 	 * @param $resultType - tipo de formato del resultado (obj,asoc,num)
 	 * @return $resultType
 	 */
 	//
-	public function executeSQL($sql,$resultType="obj") {
+	public function executeSQL($sql,$params=[],$resultType="obj") {
+		//Por si se llama como antes: executeSQL($sql,"asoc")
+		if (is_string($params)) {
+			$resultType = $params;
+			$params = [];
+		}
 		$lista = NULL;
 		try {
 			$this->connect();	
-			if ($result = $this->link->query ( $sql )) {
+			if ($result = $this->ejecutar ( $sql, $params )) {
+				//Se recorre de la primera fila a la última para respetar el ORDER BY
 				for ($num_fila = 0; $num_fila < $result->num_rows; $num_fila++) {
 					$result->data_seek ( $num_fila );
 					switch ($resultType){
@@ -64,7 +83,6 @@ class MySqlConnect {
 					
 				}
 			} else {
-				handleException($this->link->error);
 				throw new \Exception('Error: Falló la ejecución de la sentencia'.$this->link->errno.' '.$this->link->error);
 			}
 			$this->link->close();
@@ -75,38 +93,38 @@ class MySqlConnect {
 	}
 	/**
 	 * Ejecutar una setencia SQL tipo INSERT,UPDATE
-	 * @param $sql - string sentencia SQL
+	 * @param $sql - string sentencia SQL (con ? para los valores)
+	 * @param $params - array valores que van en los ?, en orden
 	 * @return $num_result - numero de resultados de la ejecución
 	 */
 	//
-	public function executeSQL_DML($sql) {
+	public function executeSQL_DML($sql,$params=[]) {
 		$num_results = 0;
 		$lista = NULL;
 		try {
 			$this->connect();
-			if ($result = $this->link->query ( $sql )) {
+			if ($result = $this->ejecutar ( $sql, $params )) {
 				$num_results = mysqli_affected_rows ( $this->link );
 			}
 			$this->link->close ();
 			return $num_results;
 		} catch ( Exception $e ) {
-			/* $this->log->error("File: ".$e->getFile()." - line: ".$e->getLine()." - Code: ".$e->getCode()." - Message: ".$e->getMessage());
-			throw new \Exception('Error: ' . $e->getMessage()); */
 			handleException($e);
 		}
 	}
 	/**
 	 * Ejecutar una setencia SQL tipo INSERT,UPDATE
-	 * @param $sql - string sentencia SQL
+	 * @param $sql - string sentencia SQL (con ? para los valores)
+	 * @param $params - array valores que van en los ?, en orden
 	 * @return $num_result- último id insertado
 	 */
 	//
-	public function executeSQL_DML_last($sql) {
+	public function executeSQL_DML_last($sql,$params=[]) {
 		$num_results = 0;
 		$lista = NULL;
 		try {
 			$this->connect();
-			if ($result = $this->link->query ( $sql )) {
+			if ($result = $this->ejecutar ( $sql, $params )) {
 				$num_results =$this->link->insert_id;
 				
 			}

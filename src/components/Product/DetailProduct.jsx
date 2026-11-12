@@ -8,6 +8,7 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import DescriptionIcon from '@mui/icons-material/Description';
 import ProductService from '../../services/ProductService';
 
 //Detalle de un producto
@@ -48,12 +49,19 @@ export function DetailProduct() {
         <Grid container spacing={4}>
           {/* Imagen */}
           <Grid size={{ xs: 12, md: 5 }}>
-            <Box
-              component="img"
-              sx={{ borderRadius: '4%', maxWidth: '100%', height: 'auto' }}
-              alt={data.name}
-              src={`${BASE_URL}/${data.image_path}`}
-            />
+            {data.image_path ? (
+              <Box
+                component="img"
+                sx={{ borderRadius: '4%', maxWidth: '100%', height: 'auto' }}
+                alt={data.name}
+                src={`${BASE_URL}/${data.image_path}`}
+              />
+            ) : (
+              //Si el producto todavía no tiene imagen se pone un ícono
+              <Box sx={{ borderRadius: '4%', bgcolor: 'primary.main', color: 'white', height: 280, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <DescriptionIcon sx={{ fontSize: 96 }} />
+              </Box>
+            )}
           </Grid>
           {/* Información */}
           <Grid size={{ xs: 12, md: 7 }}>
@@ -97,4 +105,4 @@ export function DetailProduct() {
       </Box>
     </Container>
   );
-}
+}

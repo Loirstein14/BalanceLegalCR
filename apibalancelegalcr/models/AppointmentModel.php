@@ -19,14 +19,14 @@ class AppointmentModel
                             st.name AS status, st.color_hex AS status_color,
                             b.name AS branch
                      FROM appointments a, users m, users c, services s, appointment_statuses st, branches b
-                     WHERE m.id = $idManager
+                     WHERE m.id = ?
                        AND a.branch_id = m.branch_id
                        AND a.branch_id = b.id
                        AND a.client_id = c.id
                        AND a.service_id = s.id
                        AND a.status_id = st.id
                      ORDER BY a.starts_at DESC;";
-            $vResultado = $this->enlace->ExecuteSQL($vSql);
+            $vResultado = $this->enlace->ExecuteSQL($vSql, [$idManager]);
             return $vResultado;
         } catch (Exception $e) {
             handleException($e);
@@ -53,8 +53,8 @@ class AppointmentModel
                        AND a.provider_id = p.id
                        AND a.client_id = c.id
                        AND a.status_id = st.id
-                       AND a.id = $id;";
-            $vResultado = $this->enlace->ExecuteSQL($vSql);
+                       AND a.id = ?;";
+            $vResultado = $this->enlace->ExecuteSQL($vSql, [$id]);
             if (!empty($vResultado)) {
                 $vResultado = $vResultado[0];
                 //Preguntas y respuestas --answers

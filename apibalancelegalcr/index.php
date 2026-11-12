@@ -18,6 +18,12 @@ require_once "controllers/core/Response.php";
 
 /***--- Agregar todos los modelos*/
 require_once "models/ProductModel.php";
+require_once "models/ServiceModel.php";
+require_once "models/CategoryModel.php";
+require_once "models/BranchModel.php";
+require_once "models/ImageModel.php";
+require_once "models/ScheduleModel.php";
+require_once "models/BlockModel.php";
 require_once "models/InvoiceItemModel.php";
 require_once "models/InvoiceModel.php";
 require_once "models/AppointmentAnswerModel.php";
@@ -25,6 +31,12 @@ require_once "models/AppointmentModel.php";
 
 /***--- Agregar todos los controladores*/
 require_once "controllers/ProductController.php";
+require_once "controllers/ServiceController.php";
+require_once "controllers/CategoryController.php";
+require_once "controllers/BranchController.php";
+require_once "controllers/ImageController.php";
+require_once "controllers/ScheduleController.php";
+require_once "controllers/BlockController.php";
 require_once "controllers/InvoiceController.php";
 require_once "controllers/AppointmentController.php";
 
@@ -32,5 +44,3 @@ require_once "controllers/AppointmentController.php";
 require_once "routes/RoutesController.php";
 $index = new RoutesController();
 $index->index();
-
-

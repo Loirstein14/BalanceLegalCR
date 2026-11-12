@@ -29,12 +29,13 @@ CREATE TABLE roles (
 
 -- Physical locations of the business
 CREATE TABLE branches (
-  id         INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  name       VARCHAR(100) NOT NULL,
-  address    VARCHAR(255) NOT NULL,
-  phone      VARCHAR(20)  NULL,
-  email      VARCHAR(254) NULL,
-  is_active  BOOLEAN      NOT NULL DEFAULT TRUE,  -- soft delete
+  id          INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  name        VARCHAR(100) NOT NULL,
+  description VARCHAR(500) NOT NULL,              -- shown on the public home page
+  address     VARCHAR(255) NOT NULL,
+  phone       VARCHAR(20)  NULL,
+  email       VARCHAR(254) NULL,
+  is_active   BOOLEAN      NOT NULL DEFAULT TRUE, -- soft delete
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
@@ -64,7 +65,8 @@ CREATE TABLE business_settings (
 
 -- Everyone who logs in. branch_id = branch the user MANAGES (managers only).
 -- Rules the DB cannot enforce (validated in the API):
---   * a manager must have branch_id
+--   * a manager belongs to at most one branch; branch_id stays NULL
+--     until the admin assigns the manager to a branch
 --   * only one admin
 --   * self-registration always creates a client
 CREATE TABLE users (
@@ -175,38 +177,43 @@ CREATE TABLE branch_services (
 -- MODULE 3: AGENDA
 -- ---------------------------------------------------------------------
 
--- Weekly opening hours per branch (one range per weekday, 1 = Monday ... 7 = Sunday).
--- "At least 5 days and 8 hours" is validated in the API.
+-- Opening hours per branch and DATE. A date can have several ranges
+-- (e.g. morning and afternoon), so there is no UNIQUE key: overlaps
+-- between ranges are validated in the API, as well as "the date cannot
+-- be in the past" and "at least 5 days and 8 hours".
 CREATE TABLE branch_schedules (
-  id         INT UNSIGNED     NOT NULL AUTO_INCREMENT,
-  branch_id  INT UNSIGNED     NOT NULL,
-  weekday    TINYINT UNSIGNED NOT NULL,
-  open_time  TIME             NOT NULL,
-  close_time TIME             NOT NULL,
+  id            INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  branch_id     INT UNSIGNED NOT NULL,
+  schedule_date DATE         NOT NULL,
+  start_time    TIME         NOT NULL,
+  end_time      TIME         NOT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
-  UNIQUE KEY uq_schedule_branch_day (branch_id, weekday),
-  CONSTRAINT chk_schedule_weekday CHECK (weekday BETWEEN 1 AND 7),
-  CONSTRAINT chk_schedule_range   CHECK (close_time > open_time),
+  KEY idx_schedule_branch_date (branch_id, schedule_date),
+  CONSTRAINT chk_schedule_range CHECK (end_time > start_time),
   CONSTRAINT fk_schedule_branch FOREIGN KEY (branch_id) REFERENCES branches(id) ON DELETE RESTRICT
 ) ENGINE=InnoDB;
 
--- Blocked days or hours. provider_id NULL = the whole branch is blocked.
+-- Blocked hours of a branch on a given date (same shape as branch_schedules,
+-- so the overlap query is the same for both tables).
+-- provider_id NULL = the whole branch is blocked.
+-- Overlaps (block-block and block-schedule) are validated in the API.
 -- When a block is created, the API cancels the appointments inside the range.
 CREATE TABLE schedule_blocks (
   id          INT UNSIGNED NOT NULL AUTO_INCREMENT,
   branch_id   INT UNSIGNED NOT NULL,
   provider_id INT UNSIGNED NULL,
-  starts_at   DATETIME     NOT NULL,
-  ends_at     DATETIME     NOT NULL,
+  block_date  DATE         NOT NULL,
+  start_time  TIME         NOT NULL,
+  end_time    TIME         NOT NULL,
   reason      VARCHAR(150) NULL,
   created_by  INT UNSIGNED NOT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
-  KEY idx_blocks_branch_range (branch_id, starts_at, ends_at),
-  CONSTRAINT chk_blocks_range CHECK (ends_at > starts_at),
+  KEY idx_blocks_branch_date (branch_id, block_date),
+  CONSTRAINT chk_blocks_range CHECK (end_time > start_time),
   CONSTRAINT fk_blocks_branch   FOREIGN KEY (branch_id)   REFERENCES branches(id)  ON DELETE RESTRICT,
   CONSTRAINT fk_blocks_provider FOREIGN KEY (provider_id) REFERENCES providers(id) ON DELETE RESTRICT,
   CONSTRAINT fk_blocks_user     FOREIGN KEY (created_by)  REFERENCES users(id)     ON DELETE RESTRICT
