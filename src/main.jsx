@@ -13,6 +13,7 @@ import TableInvoices from './components/Invoice/TableInvoices';
 import { DetailInvoice } from './components/Invoice/DetailInvoice';
 import { ListAppointments } from './components/Appointment/ListAppointments';
 import { DetailAppointment } from './components/Appointment/DetailAppointment';
+import { CreateAppointment } from './components/Appointment/CreateAppointment';
 import TableServices from './components/Service/TableServices';
 import { DetailService } from './components/Service/DetailService';
 import { CreateService } from './components/Service/CreateService';
@@ -71,6 +72,10 @@ const rutas = createBrowserRouter(
         {
           path: '/appointment',
           element: <ListAppointments />
+        },
+        {
+          path: '/appointment/create',
+          element: <CreateAppointment />
         },
         {
           path: '/appointment/:id',

@@ -21,6 +21,7 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import FilterAltOffIcon from '@mui/icons-material/FilterAltOff';
+import AddIcon from '@mui/icons-material/Add';
 import { Link } from 'react-router-dom';
 import AppointmentService from '../../services/AppointmentService';
 
@@ -117,6 +118,9 @@ export function ListAppointments() {
               />
               <Button variant="outlined" startIcon={<FilterAltOffIcon />} onClick={cleanFilters}>
                 Limpiar
+              </Button>
+              <Button component={Link} to="/appointment/create" variant="contained" startIcon={<AddIcon />}>
+                Nueva reserva
               </Button>
             </Toolbar>
             <TableContainer>

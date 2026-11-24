@@ -23,6 +23,15 @@ class AppointmentService {
   getAvailableHours(date, ServiceId) {
     return axios.get(BASE_URL + '/availableHours/' + date + '/' + ServiceId);
   }
+  //Estado con el que queda la reserva nueva (nombre y color)
+  //localhost/appbalancelegalcr/apibalancelegalcr/appointment/initialStatus
+  getInitialStatus() {
+    return axios.get(BASE_URL + '/initialStatus');
+  }
+  //Crear reserva (el API también crea sus respuestas y la proforma)
+  createAppointment(Appointment) {
+    return axios.post(BASE_URL, JSON.stringify(Appointment));
+  }
 }
 
 export default new AppointmentService();
