@@ -13,6 +13,11 @@ class ServiceService {
   getServiceById(ServiceId) {
     return axios.get(BASE_URL + '/' + ServiceId);
   }
+  //Servicios activos que ofrece una sucursal
+  //localhost/appbalancelegalcr/apibalancelegalcr/service/getByBranch/1
+  getServicesByBranch(BranchId) {
+    return axios.get(BASE_URL + '/getByBranch/' + BranchId);
+  }
   //Crear servicio
   createService(Service) {
     return axios.post(BASE_URL, JSON.stringify(Service));

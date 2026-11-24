@@ -13,6 +13,16 @@ class AppointmentService {
   getAppointmentById(AppointmentId) {
     return axios.get(BASE_URL + '/' + AppointmentId);
   }
+  //Encargado fijo y su sucursal (los define el API)
+  //localhost/appbalancelegalcr/apibalancelegalcr/appointment/manager
+  getManager() {
+    return axios.get(BASE_URL + '/manager');
+  }
+  //Horas disponibles de un servicio en una fecha (fecha en formato aaaa-mm-dd)
+  //localhost/appbalancelegalcr/apibalancelegalcr/appointment/availableHours/2026-11-25/1
+  getAvailableHours(date, ServiceId) {
+    return axios.get(BASE_URL + '/availableHours/' + date + '/' + ServiceId);
+  }
 }
 
 export default new AppointmentService();
