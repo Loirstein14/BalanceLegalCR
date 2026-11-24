@@ -59,4 +59,38 @@ class InvoiceModel
             handleException($e);
         }
     }
+    //Crear la factura proforma de una reserva: una línea con el servicio, cantidad 1
+    //El precio sale de la BD y el impuesto de business_settings (13 %)
+    //invoice_number, issued_by e issued_at quedan en NULL hasta que se facture
+    public function createProforma($idAppointment, $idClient, $idBranch, $service)
+    {
+        try {
+            //Porcentaje de impuesto del negocio
+            $vSql = "SELECT tax_rate FROM business_settings WHERE id = 1;";
+            $taxRate = $this->enlace->ExecuteSQL($vSql)[0]->tax_rate;
+            //Cálculos de la línea (redondeados a 2 decimales, como en la BD)
+            $quantity = 1;
+            $subtotal = round($service->price * $quantity, 2);
+            $tax = round($subtotal * $taxRate / 100, 2);
+            $total = $subtotal + $tax;
+            //Encabezado: estado 1 = Proforma. Los totales son los de su única línea
+            $sql = "INSERT INTO invoices (appointment_id, client_id, branch_id, status_id, subtotal, tax_total, total)
+                    VALUES (?, ?, ?, 1, ?, ?, ?);";
+            $idInvoice = $this->enlace->executeSQL_DML_last($sql, [
+                $idAppointment, $idClient, $idBranch, $subtotal, $tax, $total,
+            ]);
+            //Línea del servicio (se copia el nombre, el precio y el impuesto de este momento)
+            $sql = "INSERT INTO invoice_items
+                        (invoice_id, service_id, description, quantity, unit_price, tax_rate,
+                         line_subtotal, line_tax, line_total)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
+            $this->enlace->executeSQL_DML($sql, [
+                $idInvoice, $service->id, $service->name, $quantity, $service->price, $taxRate,
+                $subtotal, $tax, $total,
+            ]);
+            return $idInvoice;
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
 }

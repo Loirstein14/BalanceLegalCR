@@ -21,4 +21,15 @@ class AppointmentAnswerModel
             handleException($e);
         }
     }
+    //Guardar la respuesta de una pregunta de la reserva
+    public function create($idAppointment, $idQuestion, $answerText)
+    {
+        try {
+            $sql = "INSERT INTO appointment_answers (appointment_id, question_id, answer_text)
+                    VALUES (?, ?, ?);";
+            return $this->enlace->executeSQL_DML($sql, [$idAppointment, $idQuestion, $answerText]);
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
 }

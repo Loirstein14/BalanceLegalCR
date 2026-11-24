@@ -152,6 +152,59 @@ class AppointmentModel
             handleException($e);
         }
     }
+    //Un estado de cita con su color (para mostrar el estado inicial en el formulario)
+    public function getStatus($idStatus)
+    {
+        try {
+            $vSql = "SELECT id, name, color_hex FROM appointment_statuses WHERE id = ?;";
+            $vResultado = $this->enlace->ExecuteSQL($vSql, [$idStatus]);
+            if (!empty($vResultado)) {
+                return $vResultado[0];
+            }
+            return $vResultado;
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
+    //Crear reserva: la cita, sus respuestas y la factura proforma
+    //$manager trae la sucursal y el provider_id del encargado que registra la reserva
+    public function create($objeto, $manager, $idStatus)
+    {
+        try {
+            $serviceM = new ServiceModel();
+            $answerM = new AppointmentAnswerModel();
+            $invoiceM = new InvoiceModel();
+            //Servicio: la duración define la hora final y el precio va en la proforma
+            $service = $serviceM->get($objeto->service_id);
+            //Insertar la cita. La hora final la calcula MySQL: inicio + duración del servicio
+            $sql = "INSERT INTO appointments
+                        (client_id, provider_id, branch_id, service_id, status_id, starts_at, ends_at, created_by)
+                    VALUES (?, ?, ?, ?, ?, TIMESTAMP(?, ?), DATE_ADD(TIMESTAMP(?, ?), INTERVAL ? MINUTE), ?);";
+            $idAppointment = $this->enlace->executeSQL_DML_last($sql, [
+                $objeto->client_id,
+                $manager->provider_id,
+                $manager->branch_id,
+                $objeto->service_id,
+                $idStatus,
+                $objeto->date, $objeto->start_time,
+                $objeto->date, $objeto->start_time,
+                $service->duration_minutes,
+                $manager->id,
+            ]);
+            //Respuestas de las preguntas del negocio
+            foreach ($objeto->answers as $answer) {
+                $answerM->create($idAppointment, $answer->question_id, $answer->answer_text);
+            }
+            //Factura proforma de la reserva (cliente, sucursal y el servicio x 1)
+            $idInvoice = $invoiceM->createProforma($idAppointment, $objeto->client_id, $manager->branch_id, $service);
+            //Retornar la reserva creada, con el id de su proforma
+            $appointment = $this->get($idAppointment);
+            $appointment->invoice_id = $idInvoice;
+            return $appointment;
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
     //'09:30:00' -> 570 (minutos desde la medianoche), para poder sumar y comparar
     private function toMinutes($time)
     {

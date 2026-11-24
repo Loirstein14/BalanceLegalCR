@@ -21,6 +21,22 @@ class UserModel
             handleException($e);
         }
     }
+    //Un cliente activo por id (para validar el cliente que viene en la reserva)
+    public function getCustomer($id)
+    {
+        try {
+            $vSql = "SELECT id, CONCAT(first_name, ' ', last_name) AS name, email
+                     FROM users
+                     WHERE role_id = 1 AND is_active = 1 AND id = ?;";
+            $vResultado = $this->enlace->ExecuteSQL($vSql, [$id]);
+            if (!empty($vResultado)) {
+                return $vResultado[0];
+            }
+            return $vResultado;
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
     //Datos del encargado (role_id 2) con su sucursal y su registro de abogado (providers)
     //provider_id se ocupa al guardar la reserva: la cita la atiende el encargado que la registra
     public function getManager($idManager)
