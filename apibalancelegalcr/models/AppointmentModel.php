@@ -11,7 +11,8 @@ class AppointmentModel
     public function getByManager($idManager)
     {
         try {
-            $vSql = "SELECT a.id, a.starts_at,
+            //client_id y starts_at se ocupan en React para los filtros por cliente y por fecha
+            $vSql = "SELECT a.id, a.starts_at, a.client_id,
                             DATE_FORMAT(a.starts_at, '%d/%m/%Y') AS appointment_date,
                             CONCAT(DATE_FORMAT(a.starts_at, '%H:%i'), ' - ', DATE_FORMAT(a.ends_at, '%H:%i')) AS time_range,
                             CONCAT(c.first_name, ' ', c.last_name) AS client,
@@ -45,6 +46,7 @@ class AppointmentModel
                             s.name AS service,
                             p.display_name AS provider,
                             CONCAT(c.first_name, ' ', c.last_name) AS client,
+                            c.email AS client_email,
                             st.name AS status, st.color_hex AS status_color,
                             a.cancellation_reason
                      FROM appointments a, branches b, services s, providers p, users c, appointment_statuses st

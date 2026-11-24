@@ -86,6 +86,7 @@ export function DetailAppointment() {
               {field('Servicio', data.service)}
               {field('Abogado', data.provider)}
               {field('Cliente', data.client)}
+              {field('Correo', data.client_email)}
             </Grid>
           </Grid>
           {data.cancellation_reason && field('Motivo de cancelación', data.cancellation_reason)}
