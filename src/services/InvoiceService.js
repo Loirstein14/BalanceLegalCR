@@ -3,7 +3,7 @@ import axios from 'axios';
 const BASE_URL = import.meta.env.VITE_BASE_URL + 'invoice';
 
 class InvoiceService {
-  //Listado de facturas (más reciente primero)
+  //Facturas de la sucursal del encargado (más reciente primero)
   //localhost/appbalancelegalcr/apibalancelegalcr/invoice
   getInvoices() {
     return axios.get(BASE_URL);

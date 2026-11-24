@@ -1,14 +1,21 @@
 <?php
 class invoice
 {
-    //GET Listado de facturas
+    //Encargado fijo establecido en el controlador (el mismo de las reservas)
+    //Usuario 2: Adrián Pérez, encargado de la Oficina Central
+    private $idManager = 2;
+
+    //GET Historial de facturas de la sucursal del encargado
     //localhost/appbalancelegalcr/apibalancelegalcr/invoice
     public function index()
     {
         try {
             $response = new Response();
+            //La sucursal sale del encargado
+            $userM = new UserModel();
+            $manager = $userM->getManager($this->idManager);
             $invoiceM = new InvoiceModel();
-            $result = $invoiceM->all();
+            $result = $invoiceM->getByBranch($manager->branch_id);
             $response->toJSON($result);
         } catch (Exception $e) {
             handleException($e);

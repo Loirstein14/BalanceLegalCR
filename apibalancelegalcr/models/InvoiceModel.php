@@ -6,21 +6,26 @@ class InvoiceModel
     {
         $this->enlace = new MySqlConnect(); //Conectarse a la BD
     }
-    //Obtener el listado de facturas, de la más reciente a la más antigua
-    //Fecha de la factura: fecha de emisión si está en firme, si no la de creación (proforma)
-    public function all()
+    //Facturas de una sucursal (la del encargado), de la más reciente a la más antigua
+    //Fecha de la factura: fecha de emisión si ya está facturada, si no la de creación (proforma)
+    //status_id, client_id e invoice_datetime se ocupan en React para el estado y los filtros
+    public function getByBranch($idBranch)
     {
         try {
-            $vSql = "SELECT i.id,
+            $vSql = "SELECT i.id, i.status_id, s.name AS status, i.client_id,
                             COALESCE(i.invoice_number, CONCAT('Proforma #', i.id)) AS number,
                             DATE_FORMAT(COALESCE(i.issued_at, i.created_at), '%d/%m/%Y') AS invoice_date,
                             COALESCE(i.issued_at, i.created_at) AS invoice_datetime,
                             CONCAT(u.first_name, ' ', u.last_name) AS client,
+                            b.name AS branch,
                             i.total
-                     FROM invoices i, users u
+                     FROM invoices i, users u, invoice_statuses s, branches b
                      WHERE i.client_id = u.id
+                       AND i.status_id = s.id
+                       AND i.branch_id = b.id
+                       AND i.branch_id = ?
                      ORDER BY invoice_datetime DESC, i.id DESC;";
-            $vResultado = $this->enlace->ExecuteSQL($vSql);
+            $vResultado = $this->enlace->ExecuteSQL($vSql, [$idBranch]);
             return $vResultado;
         } catch (Exception $e) {
             handleException($e);
