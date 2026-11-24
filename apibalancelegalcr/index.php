@@ -28,6 +28,8 @@ require_once "models/InvoiceItemModel.php";
 require_once "models/InvoiceModel.php";
 require_once "models/AppointmentAnswerModel.php";
 require_once "models/AppointmentModel.php";
+require_once "models/UserModel.php";
+require_once "models/BookingQuestionModel.php";
 
 /***--- Agregar todos los controladores*/
 require_once "controllers/ProductController.php";
@@ -39,6 +41,8 @@ require_once "controllers/ScheduleController.php";
 require_once "controllers/BlockController.php";
 require_once "controllers/InvoiceController.php";
 require_once "controllers/AppointmentController.php";
+require_once "controllers/UserController.php";
+require_once "controllers/QuestionController.php";
 
 //Enrutador
 require_once "routes/RoutesController.php";

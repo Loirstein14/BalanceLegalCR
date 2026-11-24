@@ -30,6 +30,19 @@ class service
             handleException($e);
         }
     }
+    //GET Servicios que ofrece una sucursal
+    //localhost/appbalancelegalcr/apibalancelegalcr/service/getByBranch/1
+    public function getByBranch($idBranch)
+    {
+        try {
+            $response = new Response();
+            $serviceM = new ServiceModel();
+            $result = $serviceM->getByBranch($idBranch);
+            $response->toJSON($result, "La sucursal no tiene servicios activos");
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
     //POST Crear
     public function create()
     {

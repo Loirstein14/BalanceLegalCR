@@ -47,6 +47,23 @@ class ServiceModel
             handleException($e);
         }
     }
+    //Servicios activos que ofrece una sucursal (tabla branch_services)
+    //Se manda la duración y el precio para mostrarlos al escoger el servicio en la reserva
+    public function getByBranch($idBranch)
+    {
+        try {
+            $vSql = "SELECT s.id, s.name, s.price, s.duration_minutes
+                     FROM services s, branch_services bs
+                     WHERE bs.service_id = s.id
+                       AND bs.branch_id = ?
+                       AND s.is_active = 1
+                     ORDER BY s.name;";
+            $vResultado = $this->enlace->ExecuteSQL($vSql, [$idBranch]);
+            return $vResultado;
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
     //Revisar si ya hay otro servicio con ese nombre (al modificar no se compara consigo mismo)
     public function nameExists($name, $idService = 0)
     {

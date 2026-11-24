@@ -67,4 +67,100 @@ class AppointmentModel
             handleException($e);
         }
     }
+    //Horas disponibles para reservar un servicio en una sucursal y una fecha
+    //Una hora sirve si el servicio completo cabe dentro del horario de ese día,
+    //no choca con un bloqueo ni con otra cita activa, y (si la fecha es hoy) todavía no ha pasado
+    public function availableHours($idBranch, $date, $idService)
+    {
+        try {
+            //Fecha y hora actual de MySQL (igual que en el Avance 4 se usa la BD como reloj)
+            $vSql = "SELECT CURDATE() AS today, CURTIME() AS now_time;";
+            $now = $this->enlace->ExecuteSQL($vSql)[0];
+            //Fecha pasada: no hay horas
+            if ($date < $now->today) {
+                return [];
+            }
+            //Duración del servicio, solo si la sucursal lo ofrece y está activo
+            $vSql = "SELECT s.duration_minutes
+                     FROM services s, branch_services bs
+                     WHERE bs.service_id = s.id
+                       AND bs.branch_id = ?
+                       AND s.id = ?
+                       AND s.is_active = 1;";
+            $service = $this->enlace->ExecuteSQL($vSql, [$idBranch, $idService]);
+            if (empty($service)) {
+                return [];
+            }
+            $duration = $service[0]->duration_minutes;
+            //Horario de la sucursal ese día (puede tener más de un rango)
+            $vSql = "SELECT start_time, end_time
+                     FROM branch_schedules
+                     WHERE branch_id = ? AND schedule_date = ?
+                     ORDER BY start_time;";
+            $schedules = $this->enlace->ExecuteSQL($vSql, [$idBranch, $date]);
+            //Si ese día la sucursal no abre, no hay horas
+            //(cuando no hay filas, executeSQL devuelve null y no un arreglo vacío)
+            if (empty($schedules)) {
+                return [];
+            }
+            //Rangos ocupados ese día: los bloqueos y las citas activas
+            //Las citas Canceladas (5) y No asistió (6) ya no ocupan el espacio
+            $vSql = "SELECT start_time, end_time
+                     FROM schedule_blocks
+                     WHERE branch_id = ? AND block_date = ?
+                     UNION ALL
+                     SELECT TIME(starts_at), TIME(ends_at)
+                     FROM appointments
+                     WHERE branch_id = ? AND DATE(starts_at) = ? AND status_id NOT IN (5, 6);";
+            $busy = $this->enlace->ExecuteSQL($vSql, [$idBranch, $date, $idBranch, $date]);
+            //Día sin bloqueos ni citas: nada ocupado
+            if (empty($busy)) {
+                $busy = [];
+            }
+
+            $hours = [];
+            foreach ($schedules as $schedule) {
+                $start = $this->toMinutes($schedule->start_time);
+                $end = $this->toMinutes($schedule->end_time);
+                //Una opción cada hora (los servicios duran 1 o 2 horas),
+                //mientras el servicio completo termine antes de que cierre el horario
+                for ($hour = $start; $hour + $duration <= $end; $hour += 60) {
+                    $free = true;
+                    //Si es hoy, la hora tiene que ser después de la hora actual
+                    if ($date == $now->today && $hour <= $this->toMinutes($now->now_time)) {
+                        $free = false;
+                    }
+                    //Misma regla de traslape del Avance 4:
+                    //choca si empieza antes de que termine el otro y termina después de que empiece
+                    foreach ($busy as $range) {
+                        if ($hour < $this->toMinutes($range->end_time)
+                            && $hour + $duration > $this->toMinutes($range->start_time)) {
+                            $free = false;
+                        }
+                    }
+                    if ($free) {
+                        $hours[] = (object) [
+                            'start_time' => $this->toTime($hour),
+                            'end_time' => $this->toTime($hour + $duration),
+                            'label' => $this->toTime($hour) . ' - ' . $this->toTime($hour + $duration),
+                        ];
+                    }
+                }
+            }
+            return $hours;
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
+    //'09:30:00' -> 570 (minutos desde la medianoche), para poder sumar y comparar
+    private function toMinutes($time)
+    {
+        $parts = explode(':', $time);
+        return (int) $parts[0] * 60 + (int) $parts[1];
+    }
+    //570 -> '09:30'
+    private function toTime($minutes)
+    {
+        return sprintf('%02d:%02d', intdiv($minutes, 60), $minutes % 60);
+    }
 }
