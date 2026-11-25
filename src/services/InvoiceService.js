@@ -13,6 +13,15 @@ class InvoiceService {
   getInvoiceById(InvoiceId) {
     return axios.get(BASE_URL + '/' + InvoiceId);
   }
+  //Encabezado de la factura: encargado, sucursal y % de impuesto
+  //localhost/appbalancelegalcr/apibalancelegalcr/invoice/header
+  getHeader() {
+    return axios.get(BASE_URL + '/header');
+  }
+  //Crear factura (el API calcula los totales con los precios de la BD)
+  createInvoice(Invoice) {
+    return axios.post(BASE_URL, JSON.stringify(Invoice));
+  }
 }
 
 export default new InvoiceService();

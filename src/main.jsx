@@ -11,6 +11,7 @@ import { DetailProduct } from './components/Product/DetailProduct';
 import TableProducts from './components/Product/TableProducts';
 import TableInvoices from './components/Invoice/TableInvoices';
 import { DetailInvoice } from './components/Invoice/DetailInvoice';
+import { CreateInvoice } from './components/Invoice/CreateInvoice';
 import { ListAppointments } from './components/Appointment/ListAppointments';
 import { DetailAppointment } from './components/Appointment/DetailAppointment';
 import { CreateAppointment } from './components/Appointment/CreateAppointment';
@@ -64,6 +65,10 @@ const rutas = createBrowserRouter(
         {
           path: '/invoice',
           element: <TableInvoices />
+        },
+        {
+          path: '/invoice/create',
+          element: <CreateInvoice />
         },
         {
           path: '/invoice/:id',

@@ -25,6 +25,7 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import FilterAltOffIcon from '@mui/icons-material/FilterAltOff';
+import AddIcon from '@mui/icons-material/Add';
 import { visuallyHidden } from '@mui/utils';
 import { Link } from 'react-router-dom';
 import InvoiceService from '../../services/InvoiceService';
@@ -248,6 +249,9 @@ export default function TableInvoices() {
               />
               <Button variant="outlined" startIcon={<FilterAltOffIcon />} onClick={cleanFilters}>
                 Limpiar
+              </Button>
+              <Button component={Link} to="/invoice/create" variant="contained" startIcon={<AddIcon />}>
+                Nueva factura
               </Button>
             </Toolbar>
             <TableContainer>
