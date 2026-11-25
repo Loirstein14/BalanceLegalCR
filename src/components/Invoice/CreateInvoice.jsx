@@ -4,6 +4,7 @@ import FormControl from '@mui/material/FormControl';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
+import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
@@ -30,6 +31,7 @@ import ServiceService from '../../services/ServiceService';
 import ProductService from '../../services/ProductService';
 import { SelectClient } from '../Appointment/Form/SelectClient';
 import { SelectItem } from './Form/SelectItem';
+import { DollarTotal } from './DollarTotal';
 
 //Celdas de la tabla de líneas (mismo estilo del Cart.jsx del profe)
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -451,6 +453,10 @@ export function CreateInvoice() {
             <FormHelperText sx={{ color: '#d32f2f', ml: 1 }}>
               {errors.items?.message || errors.items?.root?.message || ' '}
             </FormHelperText>
+            {/* Total en dólares en tiempo real (web service de Hacienda) */}
+            <Box sx={{ mr: 2 }}>
+              <DollarTotal total={totals.total} />
+            </Box>
           </Grid>
           <Grid size={12}>
             <Button type="submit" variant="contained" color="secondary" sx={{ m: 1 }}>

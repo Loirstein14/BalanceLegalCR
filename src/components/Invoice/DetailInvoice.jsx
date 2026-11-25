@@ -16,6 +16,7 @@ import TableRow from '@mui/material/TableRow';
 import Button from '@mui/material/Button';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import InvoiceService from '../../services/InvoiceService';
+import { DollarTotal } from './DollarTotal';
 
 //Formato de moneda en colones con dos decimales
 const money = (value) =>
@@ -132,6 +133,10 @@ export function DetailInvoice() {
               <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Total a pagar</Typography>
                 <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{money(data.total)}</Typography>
+              </Box>
+              {/* Total en dólares (web service de Hacienda) */}
+              <Box sx={{ mt: 1 }}>
+                <DollarTotal total={Number(data.total)} />
               </Box>
             </Box>
           </Box>

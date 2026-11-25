@@ -30,6 +30,7 @@ require_once "models/AppointmentAnswerModel.php";
 require_once "models/AppointmentModel.php";
 require_once "models/UserModel.php";
 require_once "models/BookingQuestionModel.php";
+require_once "models/ExchangeRateModel.php";
 
 /***--- Agregar todos los controladores*/
 require_once "controllers/ProductController.php";
@@ -43,6 +44,7 @@ require_once "controllers/InvoiceController.php";
 require_once "controllers/AppointmentController.php";
 require_once "controllers/UserController.php";
 require_once "controllers/QuestionController.php";
+require_once "controllers/ExchangeRateController.php";
 
 //Enrutador
 require_once "routes/RoutesController.php";
