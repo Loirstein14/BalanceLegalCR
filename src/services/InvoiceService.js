@@ -22,6 +22,14 @@ class InvoiceService {
   createInvoice(Invoice) {
     return axios.post(BASE_URL, JSON.stringify(Invoice));
   }
+  //Facturar una proforma (el id va dentro del objeto, con las líneas)
+  issueProforma(Invoice) {
+    return axios({
+      method: 'put',
+      url: BASE_URL,
+      data: JSON.stringify(Invoice),
+    });
+  }
 }
 
 export default new InvoiceService();

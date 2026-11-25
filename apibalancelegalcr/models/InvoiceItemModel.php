@@ -10,7 +10,9 @@ class InvoiceItemModel
     public function getByInvoice($idInvoice)
     {
         try {
-            $vSql = "SELECT it.id, it.description, it.quantity, it.unit_price, it.line_subtotal,
+            //product_id y service_id se ocupan para precargar las líneas al facturar una proforma
+            $vSql = "SELECT it.id, it.product_id, it.service_id, it.description, it.quantity,
+                            it.unit_price, it.line_subtotal,
                             CASE WHEN it.service_id IS NOT NULL THEN 'Servicio' ELSE 'Producto' END AS item_type
                      FROM invoice_items it
                      WHERE it.invoice_id = ?

@@ -21,7 +21,7 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
 import InvoiceService from '../../services/InvoiceService';
@@ -54,8 +54,14 @@ const money = (value) =>
 const round2 = (value) => Math.round(value * 100) / 100;
 
 //Registrar factura: la emite el encargado fijo, en su sucursal, con productos y/o servicios
+//El mismo formulario sirve para facturar una proforma: /invoice/issue/:id
+//(el formulario es idéntico, por eso no se hizo un componente aparte)
 export function CreateInvoice() {
   const navigate = useNavigate();
+  //Si la ruta trae id, se está facturando esa proforma
+  const routeParams = useParams();
+  const id = routeParams.id || null;
+  const isProforma = id !== null;
   //Fecha de hoy con date-fns (dd/mm/aaaa)
   const todayText = format(new Date(), 'dd/MM/yyyy');
 
@@ -83,6 +89,9 @@ export function CreateInvoice() {
         return new Set(keys).size === keys.length;
       }),
   });
+  //Valores de la proforma para precargar el formulario (null si es factura nueva)
+  const [proforma, setProforma] = useState(null);
+  const [proformaValues, setProformaValues] = useState(null);
   const {
     control,
     handleSubmit,
@@ -94,6 +103,8 @@ export function CreateInvoice() {
       //Empieza con una línea vacía
       items: [{ item: '', quantity: 1 }],
     },
+    //Valores a precargar (igual que en los Update): los de la proforma
+    values: proformaValues,
     // Asignación de validaciones
     resolver: yupResolver(invoiceSchema),
   });
@@ -135,6 +146,34 @@ export function CreateInvoice() {
         setError(error);
       });
   }, []);
+
+  //Facturar proforma: cargarla y pasar sus datos al formulario
+  useEffect(() => {
+    if (!id) return;
+    InvoiceService.getInvoiceById(id)
+      .then((response) => {
+        console.log(response);
+        //Solo se puede facturar si todavía es proforma (estado 1)
+        if (response.data.status_id !== 1) {
+          toast.error(`${response.data.number} ya no es una proforma (estado: ${response.data.status})`);
+          navigate('/invoice');
+          return;
+        }
+        setProforma(response.data);
+        //Cliente y líneas de la proforma: cada línea con su clave 'S-id' o 'P-id' y su cantidad
+        setProformaValues({
+          client_id: response.data.client_id,
+          items: response.data.items.map((line) => ({
+            item: line.service_id ? 'S-' + line.service_id : 'P-' + line.product_id,
+            quantity: line.quantity,
+          })),
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+        setError(error);
+      });
+  }, [id, navigate]);
 
   //Lista de clientes
   const [dataClients, setDataClients] = useState([]);
@@ -194,14 +233,20 @@ export function CreateInvoice() {
         };
       }),
     };
+    //Facturar proforma: se manda el id (el cliente lo pone el API, es el de la proforma)
+    //Factura nueva: se crea
+    const request = isProforma
+      ? InvoiceService.issueProforma({ id: Number(id), items: invoice.items })
+      : InvoiceService.createInvoice(invoice);
     try {
-      //Crear factura
-      InvoiceService.createInvoice(invoice)
+      request
         .then((response) => {
           //Respuesta al usuario
           if (response.data != null) {
             toast.success(
-              `Factura ${response.data.number} registrada a ${response.data.client_name} por ${money(response.data.total)}`,
+              isProforma
+                ? `Proforma #${id} facturada como ${response.data.number} por ${money(response.data.total)}`
+                : `Factura ${response.data.number} registrada a ${response.data.client_name} por ${money(response.data.total)}`,
               {
                 duration: 5000,
                 position: 'top-center',
@@ -232,8 +277,14 @@ export function CreateInvoice() {
         <Grid container spacing={1}>
           <Grid size={12}>
             <Typography variant="h5" gutterBottom>
-              Registrar Factura
+              {isProforma ? `Facturar Proforma #${id}` : 'Registrar Factura'}
             </Typography>
+            {proforma && proforma.appointment_id && (
+              <Typography variant="body2" color="text.secondary">
+                Proforma generada por la reserva #{proforma.appointment_id}. Puede agregar o quitar productos y
+                servicios antes de facturar.
+              </Typography>
+            )}
           </Grid>
           {/* Encabezado: solo el cliente se puede escoger */}
           <Grid size={{ xs: 12, sm: 4 }}>
@@ -263,7 +314,16 @@ export function CreateInvoice() {
           </Grid>
           <Grid size={12}>
             <FormControl variant="standard" fullWidth sx={{ m: 1 }}>
-              {loadedClients && (
+              {/* En la proforma el cliente no se cambia: es el de la reserva */}
+              {isProforma && (
+                <TextField
+                  id="client"
+                  label="Cliente"
+                  value={proforma ? `${proforma.client_name} — ${proforma.client_email}` : ''}
+                  slotProps={{ input: { readOnly: true } }}
+                />
+              )}
+              {!isProforma && loadedClients && (
                 <Controller
                   name="client_id"
                   control={control}
@@ -394,7 +454,7 @@ export function CreateInvoice() {
           </Grid>
           <Grid size={12}>
             <Button type="submit" variant="contained" color="secondary" sx={{ m: 1 }}>
-              Guardar
+              {isProforma ? 'Facturar' : 'Guardar'}
             </Button>
             <Button variant="outlined" sx={{ m: 1 }} onClick={() => navigate('/invoice')}>
               Cancelar

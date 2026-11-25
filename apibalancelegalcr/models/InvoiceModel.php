@@ -36,7 +36,8 @@ class InvoiceModel
     {
         try {
             $itemM = new InvoiceItemModel(); //Instanciar el modelo de líneas de factura
-            $vSql = "SELECT i.id,
+            //status_id, client_id, branch_id y appointment_id se ocupan para facturar una proforma
+            $vSql = "SELECT i.id, i.status_id, i.client_id, i.branch_id, i.appointment_id,
                             COALESCE(i.invoice_number, CONCAT('Proforma #', i.id)) AS number,
                             s.name AS status,
                             DATE_FORMAT(COALESCE(i.issued_at, i.created_at), '%d/%m/%Y') AS invoice_date,
@@ -191,6 +192,34 @@ class InvoiceModel
             //Líneas de detalle
             $this->createItems($idInvoice, $calc->lines);
             //Retornar la factura creada
+            return $this->get($idInvoice);
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
+    //Facturar una proforma: pasa a Facturado (estado 2) con su número, quién la emite y la fecha de hoy
+    //Las líneas se reemplazan por las del formulario (se borran las de la proforma y se insertan las nuevas)
+    public function issueProforma($idInvoice, $objeto, $manager)
+    {
+        try {
+            //Líneas y totales calculados con los precios de la BD
+            $calc = $this->calculateLines($objeto->items);
+            //Encabezado (status_id = 1 en el WHERE: solo se factura si todavía es proforma)
+            $sql = "UPDATE invoices
+                    SET invoice_number = ?, status_id = 2, issued_by = ?, issued_at = NOW(),
+                        subtotal = ?, tax_total = ?, total = ?
+                    WHERE id = ? AND status_id = 1;";
+            $this->enlace->executeSQL_DML($sql, [
+                $this->nextNumber(), $manager->id,
+                $calc->subtotal, $calc->tax_total, $calc->total,
+                $idInvoice,
+            ]);
+            //Borrar la pila: quitar las líneas de la proforma
+            $sql = "DELETE FROM invoice_items WHERE invoice_id = ?;";
+            $this->enlace->executeSQL_DML($sql, [$idInvoice]);
+            //Insertar las líneas nuevas
+            $this->createItems($idInvoice, $calc->lines);
+            //Retornar la factura
             return $this->get($idInvoice);
         } catch (Exception $e) {
             handleException($e);

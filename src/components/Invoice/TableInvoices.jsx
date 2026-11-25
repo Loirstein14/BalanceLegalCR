@@ -24,6 +24,7 @@ import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import PointOfSaleIcon from '@mui/icons-material/PointOfSale';
 import FilterAltOffIcon from '@mui/icons-material/FilterAltOff';
 import AddIcon from '@mui/icons-material/Add';
 import { visuallyHidden } from '@mui/utils';
@@ -112,7 +113,7 @@ function TableInvoicesHead(props) {
           </TableCell>
         ))}
         <TableCell align="center" sx={{ fontWeight: 'bold' }}>
-          Detalle
+          Acciones
         </TableCell>
       </TableRow>
     </TableHead>
@@ -299,6 +300,14 @@ export default function TableInvoices() {
                               <VisibilityIcon />
                             </IconButton>
                           </Tooltip>
+                          {/* Solo las proformas se pueden facturar */}
+                          {row.status_id === 1 && (
+                            <Tooltip title="Facturar proforma">
+                              <IconButton component={Link} to={`/invoice/issue/${row.id}`} color="success">
+                                <PointOfSaleIcon />
+                              </IconButton>
+                            </Tooltip>
+                          )}
                         </TableCell>
                       </TableRow>
                     ))}

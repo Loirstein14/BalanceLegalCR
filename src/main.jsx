@@ -71,6 +71,10 @@ const rutas = createBrowserRouter(
           element: <CreateInvoice />
         },
         {
+          path: '/invoice/issue/:id',
+          element: <CreateInvoice />
+        },
+        {
           path: '/invoice/:id',
           element: <DetailInvoice />
         },

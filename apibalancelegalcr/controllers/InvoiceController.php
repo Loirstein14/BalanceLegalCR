@@ -82,6 +82,42 @@ class invoice
             handleException($e);
         }
     }
+    //PUT Facturar una proforma (el id va dentro del objeto)
+    //localhost/appbalancelegalcr/apibalancelegalcr/invoice
+    public function update()
+    {
+        try {
+            $request = new Request();
+            $response = new Response();
+            //Obtener json enviado
+            $inputJSON = $request->getJSON();
+            $userM = new UserModel();
+            $manager = $userM->getManager($this->idManager);
+            $invoiceM = new InvoiceModel();
+            //La factura tiene que existir, seguir siendo proforma y ser de la sucursal del encargado
+            $proforma = empty($inputJSON->id) ? null : $invoiceM->get($inputJSON->id);
+            if (empty($proforma) || $proforma->status_id != 1 || $proforma->branch_id != $manager->branch_id) {
+                $response->toJSON(null, "La factura no existe, ya fue facturada o no es de su sucursal");
+                return;
+            }
+            //El cliente es el de la proforma (viene de la reserva), no se cambia
+            $inputJSON->client_id = $proforma->client_id;
+            //Las líneas con cantidad 0 se eliminan
+            $inputJSON->items = $this->quitarCantidadCero($inputJSON);
+            //Mismas reglas que una factura nueva
+            $mensaje = $this->validar($inputJSON, $manager);
+            if ($mensaje) {
+                $response->toJSON(null, $mensaje);
+                return;
+            }
+            //Acción del modelo a ejecutar
+            $result = $invoiceM->issueProforma($proforma->id, $inputJSON, $manager);
+            //Dar respuesta
+            $response->toJSON($result);
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
     //Devuelve las líneas que no tienen cantidad 0
     private function quitarCantidadCero($objeto)
     {
