@@ -89,6 +89,55 @@ class ScheduleModel
             handleException($e);
         }
     }
+    //Reglas de un rango de fechas (se usa al crear horarios y bloqueos)
+    //Devuelve el mensaje del error, o null si todo está bien
+    public function checkRange($objeto)
+    {
+        //Fechas con formato aaaa-mm-dd
+        if (empty($objeto->start_date) || empty($objeto->end_date)
+            || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $objeto->start_date)
+            || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $objeto->end_date)) {
+            return "La fecha inicial y la fecha final son requeridas";
+        }
+        if ($this->isPastDate($objeto->start_date)) {
+            return "La fecha inicial no puede ser anterior a hoy";
+        }
+        if ($objeto->end_date < $objeto->start_date) {
+            return "La fecha final debe ser igual o posterior a la fecha inicial";
+        }
+        //Máximo 3 meses (92 días) por rango, para no crear cientos de registros por error
+        $dias = (strtotime($objeto->end_date) - strtotime($objeto->start_date)) / 86400;
+        if ($dias > 92) {
+            return "El rango puede ser de máximo 3 meses";
+        }
+        //Días de la semana: al menos uno, del 1 (lunes) al 7 (domingo)
+        if (empty($objeto->weekdays) || !is_array($objeto->weekdays)) {
+            return "Seleccione al menos un día de la semana";
+        }
+        foreach ($objeto->weekdays as $day) {
+            if (!in_array($day, [1, 2, 3, 4, 5, 6, 7])) {
+                return "Día de la semana no válido";
+            }
+        }
+        return null;
+    }
+    //Fechas de un rango que caen en los días de la semana escogidos
+    //$weekdays usa la numeración ISO: 1 = lunes ... 7 = domingo
+    //Ejemplo: del 2026-11-30 al 2026-12-06 con [1,2,3,4,5] -> lunes 30 a viernes 4
+    public function datesInRange($startDate, $endDate, $weekdays)
+    {
+        $dates = [];
+        $date = new DateTime($startDate);
+        $end = new DateTime($endDate);
+        while ($date <= $end) {
+            //format('N') devuelve el día de la semana: 1 (lunes) a 7 (domingo)
+            if (in_array((int) $date->format('N'), $weekdays)) {
+                $dates[] = $date->format('Y-m-d');
+            }
+            $date->modify('+1 day');
+        }
+        return $dates;
+    }
     //Crear horario
     public function create($objeto)
     {
