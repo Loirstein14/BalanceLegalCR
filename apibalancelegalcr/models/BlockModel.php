@@ -1,6 +1,6 @@
 <?php
-//Bloqueos de horas de una sucursal por fecha (tabla schedule_blocks).
-//provider_id queda en NULL: el bloqueo es para toda la sucursal.
+//bloqueos de horas de una sucursal por fecha (tabla schedule_blocks)
+//provider_id queda en NULL porque el bloqueo es para toda la sucursal
 class BlockModel
 {
     public $enlace;
@@ -8,13 +8,12 @@ class BlockModel
     {
         $this->enlace = new MySqlConnect(); //Conectarse a la BD
     }
-    //Campos que se devuelven: las horas sin segundos y la fecha en formato dd/mm/aaaa para mostrarla
+    //las horas sin segundos y la fecha en dd/mm/aaaa para mostrarla
     private $campos = "k.id, k.branch_id, b.name AS branch, k.block_date,
                        DATE_FORMAT(k.block_date, '%d/%m/%Y') AS date_text,
                        TIME_FORMAT(k.start_time, '%H:%i') AS start_time,
                        TIME_FORMAT(k.end_time, '%H:%i') AS end_time,
                        k.reason, CONCAT(u.first_name, ' ', u.last_name) AS created_by";
-    //Obtener el listado de bloqueos
     public function all()
     {
         try {
@@ -28,7 +27,6 @@ class BlockModel
             handleException($e);
         }
     }
-    //Obtener un bloqueo por su id
     public function get($id)
     {
         try {
@@ -44,7 +42,7 @@ class BlockModel
             handleException($e);
         }
     }
-    //Obtener los bloqueos de una sucursal
+    //bloqueos de una sucursal
     public function getByBranch($idBranch)
     {
         try {
@@ -58,8 +56,8 @@ class BlockModel
             handleException($e);
         }
     }
-    //Buscar un bloqueo de la misma sucursal y fecha que se traslape con el rango
-    //(la misma consulta que en ScheduleModel, pero sobre schedule_blocks)
+    //busca un bloqueo de la misma sucursal y fecha que choque con el rango
+    //(la misma consulta de ScheduleModel pero en schedule_blocks)
     public function getOverlap($idBranch, $date, $start, $end, $idBlock = 0)
     {
         try {
@@ -78,7 +76,6 @@ class BlockModel
             handleException($e);
         }
     }
-    //Crear bloqueo
     public function create($objeto)
     {
         try {
@@ -92,13 +89,12 @@ class BlockModel
                 $objeto->reason,
                 $objeto->created_by,
             ]);
-            //Retornar bloqueo
             return $this->get($idBlock);
         } catch (Exception $e) {
             handleException($e);
         }
     }
-    //Actualizar bloqueo (el id viene dentro del objeto)
+    //el id viene dentro del objeto
     public function update($objeto)
     {
         try {
@@ -113,7 +109,6 @@ class BlockModel
                 $objeto->reason,
                 $objeto->id,
             ]);
-            //Retornar bloqueo
             return $this->get($objeto->id);
         } catch (Exception $e) {
             handleException($e);

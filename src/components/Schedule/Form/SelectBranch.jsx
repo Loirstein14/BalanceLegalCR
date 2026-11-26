@@ -7,7 +7,7 @@ SelectBranch.propTypes = {
   data: PropTypes.array,
   field: PropTypes.object,
 };
-//Lista de sucursales (se usa en horarios y en bloqueos)
+//sucursales (se usa en horarios y bloqueos)
 export function SelectBranch({ field, data }) {
   return (
     <>

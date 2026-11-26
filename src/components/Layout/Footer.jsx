@@ -15,18 +15,16 @@ export function Footer() {
         backgroundColor: "primary.main",
         paddingTop: "1rem",
         paddingBottom: "1rem",
-        zIndex: 10, //Siempre por encima del contenido
+        zIndex: 10, //siempre encima del contenido
       }}
     >
       <Container maxWidth="xl">
         <Grid container sx={{ alignItems: "center" }}>
-          {/* Izquierda: universidad */}
           <Grid size={4}>
             <Typography align="left" variant="body2" sx={{ color: "common.white" }}>
               Universidad Técnica Nacional
             </Typography>
           </Grid>
-          {/* Centro: proyecto, curso y año */}
           <Grid size={4}>
             <Typography align="center" variant="subtitle1" sx={{ color: "common.white" }}>
               Balance Legal CR · ISW-613
@@ -35,7 +33,6 @@ export function Footer() {
               {`${new Date().getFullYear()}`}
             </Typography>
           </Grid>
-          {/* Derecha: autor */}
           <Grid size={4}>
             <Typography align="right" variant="body2" sx={{ color: "common.white" }}>
               Luis Solis Duran

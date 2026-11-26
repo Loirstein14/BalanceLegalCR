@@ -15,7 +15,7 @@ import { SelectManagers } from './Form/SelectManagers';
 
 export function CreateBranch() {
   const navigate = useNavigate();
-  // Esquema de validación
+  //validaciones
   const branchSchema = yup.object({
     name: yup
       .string()
@@ -35,7 +35,7 @@ export function CreateBranch() {
       .required('El teléfono es requerido')
       .matches(/^\d{4}-\d{4}$/, 'El teléfono debe tener el formato 2222-3333'),
     email: yup.string().required('El correo es requerido').email('El correo no es válido'),
-    //Relación de muchos: el valor es un arreglo con los ids de los encargados (puede ir vacío)
+    //los encargados van en un arreglo de ids (puede ir vacío)
     managers: yup.array(),
   });
   const {
@@ -51,34 +51,28 @@ export function CreateBranch() {
       email: '',
       managers: [],
     },
-    // Asignación de validaciones
     resolver: yupResolver(branchSchema),
   });
 
-  // Si ocurre error al realizar el submit
   const onError = (errors, e) => console.log(errors, e);
 
-  // Accion submit
   const onSubmit = (DataForm) => {
     console.log('Formulario:');
     console.log(DataForm);
     try {
-      //Crear sucursal
       BranchService.createBranch(DataForm)
         .then((response) => {
-          //Respuesta al usuario
           if (response.data != null) {
             toast.success(`Sucursal creada #${response.data.id} - ${response.data.name}`, {
               duration: 4000,
               position: 'top-center',
             });
-            //Redirección a la tabla de sucursales
             return navigate('/branch-table');
           }
         })
         .catch((error) => {
           console.log(error);
-          //Si el API manda un mensaje (por ejemplo, nombre repetido) se le muestra al usuario
+          //si el API manda un mensaje (ej nombre repetido) se le enseña al usuario
           toast.error(
             typeof error.response?.data === 'string' && error.response.data
               ? error.response.data
@@ -90,7 +84,7 @@ export function CreateBranch() {
     }
   };
 
-  //Lista de encargados disponibles (los que no tienen sucursal)
+  //encargados libres (los que no tienen sucursal)
   const [dataManagers, setDataManagers] = useState([]);
   const [loadedManagers, setLoadedManagers] = useState(false);
   useEffect(() => {
@@ -101,7 +95,7 @@ export function CreateBranch() {
         setLoadedManagers(true);
       })
       .catch((error) => {
-        //Si no hay encargados libres el API responde con error: la lista queda vacía
+        //si no hay encargados libres el API da error y la lista queda vacía
         console.log(error);
         setDataManagers([]);
         setLoadedManagers(true);
@@ -119,7 +113,6 @@ export function CreateBranch() {
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
             <FormControl variant="standard" fullWidth sx={{ m: 1 }}>
-              {/* Controlador y entrada de formulario name */}
               <Controller
                 name="name"
                 control={control}
@@ -208,7 +201,6 @@ export function CreateBranch() {
           </Grid>
           <Grid size={12}>
             <FormControl variant="standard" fullWidth sx={{ m: 1 }}>
-              {/* Lista de encargados */}
               {loadedManagers && (
                 <Controller
                   name="managers"

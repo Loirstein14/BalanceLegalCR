@@ -13,7 +13,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import GavelIcon from '@mui/icons-material/Gavel';
 import ServiceService from '../../services/ServiceService';
 
-//Una fila del detalle tipo "Etiqueta: valor"
+//fila del detalle tipo "etiqueta: valor"
 function InfoRow({ label, children }) {
   return (
     <Typography variant="subtitle1" sx={{ mb: 1 }}>
@@ -30,16 +30,15 @@ InfoRow.propTypes = {
   children: PropTypes.node,
 };
 
-//Detalle de un servicio
+//detalle de un servicio
 export function DetailService() {
-  const routeParams = useParams(); //Agarrar el id del servicio de la ruta
+  const routeParams = useParams();
   const navigate = useNavigate();
   const IMG_URL = import.meta.env.VITE_BASE_URL + 'uploads';
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
   const [loaded, setLoaded] = useState(false);
 
-  //Llamar al API para traer el servicio
   useEffect(() => {
     ServiceService.getServiceById(routeParams.id)
       .then((response) => {
@@ -60,7 +59,6 @@ export function DetailService() {
     <Container component="main" sx={{ mt: 4, mb: 2 }}>
       {data && (
         <Grid container spacing={4}>
-          {/* Imagen */}
           <Grid size={{ xs: 12, md: 5 }}>
             {data.image_path ? (
               <Box component="img" sx={{ borderRadius: '4%', maxWidth: '100%', height: 'auto' }} alt={data.name} src={`${IMG_URL}/${data.image_path}`} />
@@ -70,7 +68,6 @@ export function DetailService() {
               </Box>
             )}
           </Grid>
-          {/* Información */}
           <Grid size={{ xs: 12, md: 7 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <Typography variant="h4" component="h1" gutterBottom>

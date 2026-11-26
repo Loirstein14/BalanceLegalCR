@@ -18,17 +18,14 @@ import { SelectHour } from '../Schedule/Form/SelectHour';
 export function UpdateBlock() {
   const navigate = useNavigate();
   const routeParams = useParams();
-  //Id del bloqueo a actualizar
   const id = routeParams.id || null;
-  //Valores a precargar en el formulario, vienen del API
   const [values, setValores] = useState(null);
-  //Obtener el bloqueo del API
   useEffect(() => {
     if (id != undefined && !isNaN(Number(id))) {
       BlockService.getBlockById(id)
         .then((response) => {
           console.log(response.data);
-          //Dar formato: solo los campos que gestiona el formulario
+          //solo los campos que usa el form
           setValores({
             id: response.data.id,
             branch_id: response.data.branch_id,
@@ -44,9 +41,9 @@ export function UpdateBlock() {
         });
     }
   }, [id]);
-  //Fecha de hoy en formato aaaa-mm-dd (el mismo formato del input de fecha)
+  //hoy en aaaa-mm-dd, el mismo formato del input de fecha
   const today = new Date().toLocaleDateString('en-CA');
-  // Esquema de validación
+  //validaciones
   const blockSchema = yup.object({
     branch_id: yup
       .number()
@@ -55,13 +52,13 @@ export function UpdateBlock() {
     block_date: yup
       .string()
       .required('La fecha es requerida')
-      //Validador propio (.test): la fecha no puede ser anterior a hoy
+      //la fecha no puede ser antes de hoy
       .test('fecha-no-pasada', 'La fecha no puede ser anterior a hoy', (value) => !value || value >= today),
     start_time: yup.string().required('La hora inicial es requerida'),
     end_time: yup
       .string()
       .required('La hora final es requerida')
-      //this.parent son los demás campos del formulario: se compara con la hora inicial
+      //this.parent son los otros campos, aquí se compara con la hora inicial
       .test('hora-final', 'La hora final debe ser mayor a la hora inicial', function (value) {
         return !value || !this.parent.start_time || value > this.parent.start_time;
       }),
@@ -79,26 +76,20 @@ export function UpdateBlock() {
       end_time: '',
       reason: '',
     },
-    //Valores a precargar en el formulario
     values,
-    // Asignación de validaciones
     resolver: yupResolver(blockSchema),
   });
 
-  //Gestión de errores
   const [error, setError] = useState('');
-  // Si ocurre error al realizar el submit
   const onError = (errors, e) => console.log(errors, e);
 
-  // Accion submit
   const onSubmit = (DataForm) => {
     console.log('Formulario:');
     console.log(DataForm);
     try {
-      //Actualizar bloqueo (DataForm trae el id porque viene en values)
+      //DataForm ya trae el id porque viene en values
       BlockService.updateBlock(DataForm)
         .then((response) => {
-          //Respuesta al usuario
           if (response.data != null) {
             toast.success(
               `Bloqueo actualizado #${response.data.id} - ${response.data.branch} ${response.data.date_text} de ${response.data.start_time} a ${response.data.end_time}`,
@@ -107,13 +98,12 @@ export function UpdateBlock() {
                 position: 'top-center',
               },
             );
-            //Redirección a la tabla de bloqueos
             return navigate('/block-table');
           }
         })
         .catch((error) => {
           console.log(error);
-          //El API manda el mensaje de la regla que no se cumplió (por ejemplo, un traslape)
+          //el API manda el mensaje de la regla que falló (ej un traslape)
           toast.error(
             typeof error.response?.data === 'string' && error.response.data
               ? error.response.data
@@ -126,7 +116,6 @@ export function UpdateBlock() {
     }
   };
 
-  //Lista de sucursales
   const [dataBranches, setDataBranches] = useState({});
   const [loadedBranches, setLoadedBranches] = useState(false);
   useEffect(() => {
@@ -155,7 +144,6 @@ export function UpdateBlock() {
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
             <FormControl variant="standard" fullWidth sx={{ m: 1 }}>
-              {/* Lista de sucursales */}
               {loadedBranches && (
                 <Controller
                   name="branch_id"
@@ -170,7 +158,6 @@ export function UpdateBlock() {
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
             <FormControl variant="standard" fullWidth sx={{ m: 1 }}>
-              {/* Controlador y entrada de formulario de la fecha */}
               <Controller
                 name="block_date"
                 control={control}

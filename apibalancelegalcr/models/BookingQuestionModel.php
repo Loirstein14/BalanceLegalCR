@@ -6,8 +6,8 @@ class BookingQuestionModel
     {
         $this->enlace = new MySqlConnect(); //Conectarse a la BD
     }
-    //Preguntas activas del formulario de reserva, en el orden en que se muestran
-    //answer_type dice qué campo pintar en React: text, yes_no o number
+    //preguntas activas del form de reserva, en orden
+    //answer_type dice qué campo pintar en react: text, yes_no o number
     public function all()
     {
         try {

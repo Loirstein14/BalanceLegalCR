@@ -2,7 +2,7 @@
 //localhost/appbalancelegalcr/apibalancelegalcr/question
 class question
 {
-    //GET Preguntas del formulario de reserva
+    //GET preguntas del form de reserva
     public function index()
     {
         try {

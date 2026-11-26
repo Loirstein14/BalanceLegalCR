@@ -1,6 +1,6 @@
 <?php
-//Horarios de atención de cada sucursal por fecha (tabla branch_schedules).
-//Las horas se manejan en horas completas (08:00, 09:00...) como dijo el profe.
+//horarios de cada sucursal por fecha (tabla branch_schedules)
+//las horas van en horas completas (08:00, 09:00...) como dijo el profe
 class ScheduleModel
 {
     public $enlace;
@@ -8,12 +8,12 @@ class ScheduleModel
     {
         $this->enlace = new MySqlConnect(); //Conectarse a la BD
     }
-    //Campos que se devuelven: las horas sin segundos y la fecha en formato dd/mm/aaaa para mostrarla
+    //las horas sin segundos y la fecha en dd/mm/aaaa para mostrarla
     private $campos = "s.id, s.branch_id, b.name AS branch, s.schedule_date,
                        DATE_FORMAT(s.schedule_date, '%d/%m/%Y') AS date_text,
                        TIME_FORMAT(s.start_time, '%H:%i') AS start_time,
                        TIME_FORMAT(s.end_time, '%H:%i') AS end_time";
-    //Obtener el listado de horarios (los de hoy en adelante primero)
+    //horarios, los de hoy en adelante primero
     public function all()
     {
         try {
@@ -27,7 +27,6 @@ class ScheduleModel
             handleException($e);
         }
     }
-    //Obtener un horario por su id
     public function get($id)
     {
         try {
@@ -43,7 +42,7 @@ class ScheduleModel
             handleException($e);
         }
     }
-    //Obtener los horarios de una sucursal
+    //horarios de una sucursal
     public function getByBranch($idBranch)
     {
         try {
@@ -57,9 +56,9 @@ class ScheduleModel
             handleException($e);
         }
     }
-    //Buscar un horario de la misma sucursal y fecha que se traslape con el rango.
-    //Dos rangos se traslapan si uno empieza antes de que el otro termine y termina después de que el otro empieza.
-    //$idSchedule: al modificar, para que no se compare consigo mismo
+    //busca un horario de la misma sucursal y fecha que choque con el rango
+    //chocan si uno empieza antes de que el otro termine y termina después de que el otro empieza
+    //$idSchedule es para que al editar no choque consigo mismo
     public function getOverlap($idBranch, $date, $start, $end, $idSchedule = 0)
     {
         try {
@@ -78,7 +77,7 @@ class ScheduleModel
             handleException($e);
         }
     }
-    //Revisar si una fecha ya pasó (se le pregunta a MySQL para usar la fecha del servidor de la BD)
+    //ver si una fecha ya pasó, se le pregunta a MySQL para usar la fecha de la BD
     public function isPastDate($date)
     {
         try {
@@ -89,11 +88,10 @@ class ScheduleModel
             handleException($e);
         }
     }
-    //Reglas de un rango de fechas (se usa al crear horarios y bloqueos)
-    //Devuelve el mensaje del error, o null si todo está bien
+    //reglas del rango de fechas (lo usan horarios y bloqueos)
+    //devuelve el mensaje del error o null si todo bien
     public function checkRange($objeto)
     {
-        //Fechas con formato aaaa-mm-dd
         if (empty($objeto->start_date) || empty($objeto->end_date)
             || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $objeto->start_date)
             || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $objeto->end_date)) {
@@ -105,12 +103,12 @@ class ScheduleModel
         if ($objeto->end_date < $objeto->start_date) {
             return "La fecha final debe ser igual o posterior a la fecha inicial";
         }
-        //Máximo 3 meses (92 días) por rango, para no crear cientos de registros por error
+        //máximo 3 meses por rango, para no crear cientos de registros por error
         $dias = (strtotime($objeto->end_date) - strtotime($objeto->start_date)) / 86400;
         if ($dias > 92) {
             return "El rango puede ser de máximo 3 meses";
         }
-        //Días de la semana: al menos uno, del 1 (lunes) al 7 (domingo)
+        //al menos un día, del 1 (lunes) al 7 (domingo)
         if (empty($objeto->weekdays) || !is_array($objeto->weekdays)) {
             return "Seleccione al menos un día de la semana";
         }
@@ -121,16 +119,16 @@ class ScheduleModel
         }
         return null;
     }
-    //Fechas de un rango que caen en los días de la semana escogidos
-    //$weekdays usa la numeración ISO: 1 = lunes ... 7 = domingo
-    //Ejemplo: del 2026-11-30 al 2026-12-06 con [1,2,3,4,5] -> lunes 30 a viernes 4
+    //fechas del rango que caen en los días marcados
+    //$weekdays va con la numeración ISO: 1 lunes ... 7 domingo
+    //ej: del 2026-11-30 al 2026-12-06 con [1,2,3,4,5] da lunes 30 a viernes 4
     public function datesInRange($startDate, $endDate, $weekdays)
     {
         $dates = [];
         $date = new DateTime($startDate);
         $end = new DateTime($endDate);
         while ($date <= $end) {
-            //format('N') devuelve el día de la semana: 1 (lunes) a 7 (domingo)
+            //format('N') da el día de la semana: 1 (lunes) a 7 (domingo)
             if (in_array((int) $date->format('N'), $weekdays)) {
                 $dates[] = $date->format('Y-m-d');
             }
@@ -138,7 +136,6 @@ class ScheduleModel
         }
         return $dates;
     }
-    //Crear horario
     public function create($objeto)
     {
         try {
@@ -150,13 +147,12 @@ class ScheduleModel
                 $objeto->start_time,
                 $objeto->end_time,
             ]);
-            //Retornar horario
             return $this->get($idSchedule);
         } catch (Exception $e) {
             handleException($e);
         }
     }
-    //Actualizar horario (el id viene dentro del objeto)
+    //el id viene dentro del objeto
     public function update($objeto)
     {
         try {
@@ -170,7 +166,6 @@ class ScheduleModel
                 $objeto->end_time,
                 $objeto->id,
             ]);
-            //Retornar horario
             return $this->get($objeto->id);
         } catch (Exception $e) {
             handleException($e);

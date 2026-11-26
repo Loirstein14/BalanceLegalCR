@@ -6,7 +6,7 @@ class ProductModel
     {
         $this->enlace = new MySqlConnect(); //Conectarse a la BD
     }
-    //Obtener el listado de productos activos
+    //productos activos
     public function all()
     {
         try {
@@ -20,11 +20,10 @@ class ProductModel
             handleException($e);
         }
     }
-    //Obtener un producto por su id
     public function get($id)
     {
         try {
-            //category_id y delivery_format_code se ocupan para precargar el formulario de modificar
+            //category_id y delivery_format_code son para precargar el form de editar
             $vSql = "SELECT p.id, p.name, p.description, p.price, p.image_path, p.delivery_days,
                             p.category_id, p.delivery_format AS delivery_format_code,
                             c.name AS category,
@@ -33,14 +32,14 @@ class ProductModel
                      WHERE p.category_id = c.id AND p.id = ?;";
             $vResultado = $this->enlace->ExecuteSQL($vSql, [$id]);
             if (!empty($vResultado)) {
-                return $vResultado[0]; //Un solo producto
+                return $vResultado[0];
             }
             return $vResultado;
         } catch (Exception $e) {
             handleException($e);
         }
     }
-    //Revisar si ya hay otro producto con ese nombre (al modificar no se compara consigo mismo)
+    //ver si ya hay otro producto con ese nombre (al editar no se compara consigo mismo)
     public function nameExists($name, $idProduct = 0)
     {
         try {
@@ -51,14 +50,11 @@ class ProductModel
             handleException($e);
         }
     }
-    //Crear producto
     public function create($objeto)
     {
         try {
-            //Consulta sql (el id es autoincrementable)
             $sql = "INSERT INTO products (category_id, name, description, price, delivery_format, delivery_days)
                     VALUES (?, ?, ?, ?, ?, ?);";
-            //Ejecutar la consulta y obtener el id del producto creado
             $idProduct = $this->enlace->executeSQL_DML_last($sql, [
                 $objeto->category_id,
                 $objeto->name,
@@ -67,13 +63,12 @@ class ProductModel
                 $objeto->delivery_format,
                 $objeto->delivery_days,
             ]);
-            //Retornar el producto
             return $this->get($idProduct);
         } catch (Exception $e) {
             handleException($e);
         }
     }
-    //Actualizar producto (el id viene dentro del objeto)
+    //el id viene dentro del objeto
     public function update($objeto)
     {
         try {
@@ -90,7 +85,6 @@ class ProductModel
                 $objeto->delivery_days,
                 $objeto->id,
             ]);
-            //Retornar el producto
             return $this->get($objeto->id);
         } catch (Exception $e) {
             handleException($e);

@@ -7,7 +7,7 @@ SelectClient.propTypes = {
   data: PropTypes.array,
   field: PropTypes.object,
 };
-//Lista de clientes: muestra el nombre completo y el correo (se usa en reservas y facturas)
+//clientes con nombre completo y correo (se usa en reservas y facturas)
 export function SelectClient({ field, data }) {
   return (
     <>

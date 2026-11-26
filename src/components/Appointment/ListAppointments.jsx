@@ -25,20 +25,15 @@ import AddIcon from '@mui/icons-material/Add';
 import { Link } from 'react-router-dom';
 import AppointmentService from '../../services/AppointmentService';
 
-//Historial de reservas del encargado (máximo 4 campos: fecha y hora, cliente, servicio y estado)
-//Se puede filtrar por cliente y/o por fecha
+//historial de reservas del encargado, se puede filtrar por cliente y/o fecha
 export function ListAppointments() {
-  //Resultado de consumo del API, respuesta
   const [data, setData] = useState(null);
-  //Error del API
   const [error, setError] = useState('');
-  //Booleano para establecer sí se ha recibido respuesta
   const [loaded, setLoaded] = useState(false);
-  //Filtros: cliente y fecha ('' = sin filtro)
+  //filtros, '' es sin filtro
   const [clientId, setClientId] = useState('');
   const [date, setDate] = useState('');
 
-  //Llamar al API y obtener las reservas de la sucursal del encargado
   useEffect(() => {
     AppointmentService.getAppointments()
       .then((response) => {
@@ -57,16 +52,16 @@ export function ListAppointments() {
   if (!loaded) return <p>Cargando...</p>;
   if (error) return <p>Error: {error.message}</p>;
 
-  //Clientes que tienen reservas en la sucursal, sin repetir, para el select del filtro
-  //findIndex devuelve la primera posición de ese cliente: si es la misma fila, es la primera vez que sale
+  //clientes que tienen reservas, sin repetir, para el select del filtro
+  //findIndex da la primera posición del cliente: si es la misma fila es la primera vez que sale
   const clients = data
     ? data
         .filter((row, index) => data.findIndex((item) => item.client_id === row.client_id) === index)
         .sort((a, b) => a.client.localeCompare(b.client))
     : [];
 
-  //Aplicar los filtros a la lista que vino del API (no se vuelve a llamar al API)
-  //starts_at viene como 'aaaa-mm-dd hh:mm:ss', y el input de fecha da 'aaaa-mm-dd'
+  //se filtra la lista que ya vino del API, no se vuelve a llamar
+  //starts_at viene 'aaaa-mm-dd hh:mm:ss' y el input de fecha da 'aaaa-mm-dd'
   const filtered = data
     ? data.filter(
         (row) =>
@@ -75,7 +70,6 @@ export function ListAppointments() {
       )
     : [];
 
-  //Quitar los dos filtros
   const cleanFilters = () => {
     setClientId('');
     setDate('');
@@ -90,7 +84,6 @@ export function ListAppointments() {
               <Typography sx={{ flex: '1 1 auto' }} variant="h6" component="div">
                 Historial de Reservas · {data[0].branch}
               </Typography>
-              {/* Filtro por cliente */}
               <FormControl size="small" sx={{ minWidth: 220 }}>
                 <InputLabel id="filter-client">Cliente</InputLabel>
                 <Select
@@ -107,7 +100,6 @@ export function ListAppointments() {
                   ))}
                 </Select>
               </FormControl>
-              {/* Filtro por fecha */}
               <TextField
                 size="small"
                 type="date"
@@ -155,7 +147,7 @@ export function ListAppointments() {
                       <TableCell>{row.client}</TableCell>
                       <TableCell>{row.service}</TableCell>
                       <TableCell>
-                        {/* El color del estado viene de la BD (appointment_statuses.color_hex) */}
+                        {/* el color del estado viene de la BD */}
                         <Chip
                           label={row.status}
                           size="small"

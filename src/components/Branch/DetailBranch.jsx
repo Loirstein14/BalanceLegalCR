@@ -21,7 +21,7 @@ import EmailIcon from '@mui/icons-material/Email';
 import PersonIcon from '@mui/icons-material/Person';
 import BranchService from '../../services/BranchService';
 
-//Una fila del detalle con ícono y texto
+//fila del detalle con ícono y texto
 function InfoRow({ icon, children }) {
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
@@ -36,15 +36,14 @@ InfoRow.propTypes = {
   children: PropTypes.node,
 };
 
-//Detalle de una sucursal con sus encargados
+//detalle de una sucursal con sus encargados
 export function DetailBranch() {
-  const routeParams = useParams(); //Agarrar el id de la sucursal de la ruta
+  const routeParams = useParams();
   const navigate = useNavigate();
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
   const [loaded, setLoaded] = useState(false);
 
-  //Llamar al API para traer la sucursal
   useEffect(() => {
     BranchService.getBranchById(routeParams.id)
       .then((response) => {
@@ -65,7 +64,6 @@ export function DetailBranch() {
     <Container component="main" sx={{ mt: 4, mb: 2 }}>
       {data && (
         <Grid container spacing={4}>
-          {/* Información de la sucursal */}
           <Grid size={{ xs: 12, md: 7 }}>
             <Typography variant="h4" component="h1" gutterBottom>
               {data.name}
@@ -78,7 +76,6 @@ export function DetailBranch() {
             <InfoRow icon={<PhoneIcon color="primary" />}>{data.phone}</InfoRow>
             <InfoRow icon={<EmailIcon color="primary" />}>{data.email}</InfoRow>
           </Grid>
-          {/* Encargados */}
           <Grid size={{ xs: 12, md: 5 }}>
             <Paper variant="outlined" sx={{ p: 2 }}>
               <Typography variant="h6" gutterBottom>

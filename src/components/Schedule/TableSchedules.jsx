@@ -24,17 +24,16 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import ScheduleService from '../../services/ScheduleService';
 import BranchService from '../../services/BranchService';
 
-//Tabla de mantenimiento de horarios: se puede filtrar por sucursal
+//tabla de horarios, se puede filtrar por sucursal
 export default function TableSchedules() {
   const [data, setData] = useState([]);
   const [error, setError] = useState('');
   const [loaded, setLoaded] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  //Sucursal escogida en el filtro ('' = todas)
+  //sucursal del filtro, '' son todas
   const [branchId, setBranchId] = useState('');
 
-  //Lista de sucursales para el filtro
   const [dataBranches, setDataBranches] = useState([]);
   useEffect(() => {
     BranchService.getBranches()
@@ -47,7 +46,7 @@ export default function TableSchedules() {
       });
   }, []);
 
-  //Llamar al API: todos los horarios o solo los de la sucursal escogida
+  //todos los horarios o solo los de la sucursal escogida
   useEffect(() => {
     const request = branchId ? ScheduleService.getSchedulesByBranch(branchId) : ScheduleService.getSchedules();
     request
@@ -56,7 +55,7 @@ export default function TableSchedules() {
         setLoaded(true);
       })
       .catch((error) => {
-        //Si la sucursal no tiene horarios el API responde con error: la tabla queda vacía
+        //si la sucursal no tiene horarios el API da error y la tabla queda vacía
         console.log(error);
         setData([]);
         setLoaded(true);
@@ -74,7 +73,6 @@ export default function TableSchedules() {
           <Typography sx={{ flex: '1 1 auto' }} variant="h6" component="div">
             Mantenimiento de Horarios
           </Typography>
-          {/* Filtro por sucursal */}
           <FormControl size="small" sx={{ minWidth: 220 }}>
             <InputLabel id="filter-branch">Sucursal</InputLabel>
             <Select

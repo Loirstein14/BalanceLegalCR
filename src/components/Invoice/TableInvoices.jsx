@@ -31,7 +31,7 @@ import { visuallyHidden } from '@mui/utils';
 import { Link } from 'react-router-dom';
 import InvoiceService from '../../services/InvoiceService';
 
-//Ordenar descendente (el total se compara como número)
+//el total se compara como número
 function descendingComparator(a, b, orderBy) {
   const valueA = orderBy === 'total' ? Number(a[orderBy]) : a[orderBy];
   const valueB = orderBy === 'total' ? Number(b[orderBy]) : b[orderBy];
@@ -44,14 +44,12 @@ function descendingComparator(a, b, orderBy) {
   return 0;
 }
 
-//Comparar para ordenar
 function getComparator(order, orderBy) {
   return order === 'desc'
     ? (a, b) => descendingComparator(a, b, orderBy)
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
-//Ordenar estable
 function stableSort(array, comparator) {
   const stabilizedThis = array.map((el, index) => [el, index]);
   stabilizedThis.sort((a, b) => {
@@ -64,16 +62,16 @@ function stableSort(array, comparator) {
   return stabilizedThis.map((el) => el[0]);
 }
 
-//Color del estado de la factura (colores del tema de MUI)
-//1 Proforma: naranja, 2 Facturado: verde, 3 Anulada: gris
+//color del estado con los colores del tema de MUI
+//1 proforma naranja, 2 facturado verde, 3 anulada gris
 const statusColor = (statusId) => {
   if (statusId === 1) return 'warning';
   if (statusId === 2) return 'success';
   return 'default';
 };
 
-//Encabezados de la tabla (máximo 4 campos; el estado va debajo del número de factura)
-//La fecha se ordena con invoice_datetime (fecha completa) y se muestra con invoice_date
+//máximo 4 columnas, el estado va debajo del número de factura
+//la fecha se ordena con invoice_datetime y se muestra con invoice_date
 const headCells = [
   { id: 'number', numeric: false, label: 'Factura' },
   { id: 'invoice_datetime', numeric: false, label: 'Fecha' },
@@ -81,7 +79,7 @@ const headCells = [
   { id: 'total', numeric: true, label: 'Total' },
 ];
 
-//Encabezado de la tabla con ordenamiento
+//encabezado de la tabla con ordenamiento
 function TableInvoicesHead(props) {
   const { order, orderBy, onRequestSort } = props;
   const createSortHandler = (property) => (event) => {
@@ -120,22 +118,19 @@ function TableInvoicesHead(props) {
   );
 }
 
-//Propiedades del encabezado
 TableInvoicesHead.propTypes = {
   onRequestSort: PropTypes.func.isRequired,
   order: PropTypes.oneOf(['asc', 'desc']).isRequired,
   orderBy: PropTypes.string.isRequired,
 };
 
-//Historial de facturas de la sucursal del encargado, ordenado por fecha (más reciente primero)
-//Se puede filtrar por cliente y/o por fecha
+//historial de facturas de la sucursal del encargado, la más nueva primero
+//se puede filtrar por cliente y/o fecha
 export default function TableInvoices() {
-  //Datos a cargar en la tabla
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
   const [loaded, setLoaded] = useState(false);
 
-  //Llamar al API y obtener la lista de facturas
   useEffect(() => {
     InvoiceService.getInvoices()
       .then((response) => {
@@ -151,27 +146,24 @@ export default function TableInvoices() {
       });
   }, []);
 
-  const [order, setOrder] = useState('desc'); //Más reciente primero
-  const [orderBy, setOrderBy] = useState('invoice_datetime'); //Ordenado por fecha
+  const [order, setOrder] = useState('desc'); //la más nueva primero
+  const [orderBy, setOrderBy] = useState('invoice_datetime');
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  //Filtros: cliente y fecha ('' = sin filtro)
+  //filtros, '' es sin filtro
   const [clientId, setClientId] = useState('');
   const [date, setDate] = useState('');
 
-  //Cambiar el ordenamiento al dar clic en un encabezado
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
   };
 
-  //Cambiar de página
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
 
-  //Cambiar cantidad de filas por página
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
@@ -180,15 +172,15 @@ export default function TableInvoices() {
   if (!loaded) return <p>Cargando...</p>;
   if (error) return <p>Error: {error.message}</p>;
 
-  //Clientes que tienen facturas en la sucursal, sin repetir, para el select del filtro
+  //clientes que tienen facturas, sin repetir, para el select del filtro
   const clients = data
     ? data
         .filter((row, index) => data.findIndex((item) => item.client_id === row.client_id) === index)
         .sort((a, b) => a.client.localeCompare(b.client))
     : [];
 
-  //Aplicar los filtros a la lista que vino del API (no se vuelve a llamar al API)
-  //invoice_datetime viene como 'aaaa-mm-dd hh:mm:ss', y el input de fecha da 'aaaa-mm-dd'
+  //se filtra la lista que ya vino del API, no se vuelve a llamar
+  //invoice_datetime viene 'aaaa-mm-dd hh:mm:ss' y el input de fecha da 'aaaa-mm-dd'
   const filtered = data
     ? data.filter(
         (row) =>
@@ -197,7 +189,7 @@ export default function TableInvoices() {
       )
     : [];
 
-  //Al cambiar un filtro se vuelve a la primera página
+  //al cambiar un filtro se devuelve a la primera página
   const changeClient = (value) => {
     setClientId(value);
     setPage(0);
@@ -206,7 +198,6 @@ export default function TableInvoices() {
     setDate(value);
     setPage(0);
   };
-  //Quitar los dos filtros
   const cleanFilters = () => {
     setClientId('');
     setDate('');
@@ -222,7 +213,6 @@ export default function TableInvoices() {
               <Typography sx={{ flex: '1 1 auto' }} variant="h6" component="div">
                 Historial de Facturas · {data[0].branch}
               </Typography>
-              {/* Filtro por cliente */}
               <FormControl size="small" sx={{ minWidth: 220 }}>
                 <InputLabel id="filter-client">Cliente</InputLabel>
                 <Select
@@ -239,7 +229,6 @@ export default function TableInvoices() {
                   ))}
                 </Select>
               </FormControl>
-              {/* Filtro por fecha */}
               <TextField
                 size="small"
                 type="date"
@@ -277,7 +266,6 @@ export default function TableInvoices() {
                         <TableCell>
                           {row.number}
                           <br />
-                          {/* Estado: Proforma o Facturado */}
                           <Chip
                             label={row.status}
                             size="small"
@@ -300,7 +288,7 @@ export default function TableInvoices() {
                               <VisibilityIcon />
                             </IconButton>
                           </Tooltip>
-                          {/* Solo las proformas se pueden facturar */}
+                          {/* solo las proformas se pueden facturar */}
                           {row.status_id === 1 && (
                             <Tooltip title="Facturar proforma">
                               <IconButton component={Link} to={`/invoice/issue/${row.id}`} color="success">
@@ -314,7 +302,6 @@ export default function TableInvoices() {
                 </TableBody>
               </Table>
             </TableContainer>
-            {/* Paginación */}
             <TablePagination
               rowsPerPageOptions={[5, 10, 25]}
               component="div"

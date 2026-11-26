@@ -9,13 +9,12 @@ SelectItem.propTypes = {
   used: PropTypes.array,
   error: PropTypes.bool,
 };
-//Producto o servicio de una línea de la factura, agrupados en Servicios y Productos
-//El valor es una clave con el tipo y el id: 'S-1' (servicio 1) o 'P-3' (producto 3)
-//Los que ya están en otra línea salen deshabilitados para no repetirlos
+//producto o servicio de una línea, agrupados en servicios y productos
+//el valor es una clave con el tipo y el id: 'S-1' (servicio 1) o 'P-3' (producto 3)
+//los que ya están en otra línea salen deshabilitados
 export function SelectItem({ field, data, used, error }) {
   const services = data.filter((item) => item.type === 'S');
   const products = data.filter((item) => item.type === 'P');
-  //Una opción del select
   const option = (item) => (
     <MenuItem
       key={item.key}
@@ -30,7 +29,7 @@ export function SelectItem({ field, data, used, error }) {
       <MenuItem value="" disabled>
         Seleccione...
       </MenuItem>
-      {/* MUI pide que los encabezados y las opciones vayan sueltos dentro del Select (sin <>...</>) */}
+      {/* MUI pide que los encabezados y opciones vayan sueltos en el Select, sin <>...</> */}
       <ListSubheader>Servicios</ListSubheader>
       {services.map(option)}
       <ListSubheader>Productos</ListSubheader>

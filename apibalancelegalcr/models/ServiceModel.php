@@ -6,8 +6,8 @@ class ServiceModel
     {
         $this->enlace = new MySqlConnect(); //Conectarse a la BD
     }
-    //Todos los servicios para la tabla de mantenimiento
-    //modality_name: la modalidad en español, igual que se hizo con delivery_format en productos
+    //servicios para la tabla de mantenimiento
+    //modality_name es la modalidad en español, igual que delivery_format en productos
     public function all()
     {
         try {
@@ -23,7 +23,7 @@ class ServiceModel
             handleException($e);
         }
     }
-    //Un servicio por id, junto con las sucursales donde se ofrece
+    //servicio por id con las sucursales donde se da
     public function get($id)
     {
         try {
@@ -40,15 +40,15 @@ class ServiceModel
                      GROUP BY s.id;";
             $vResultado = $this->enlace->ExecuteSQL($vSql, [$id]);
             if (!empty($vResultado)) {
-                return $vResultado[0]; //Un solo servicio
+                return $vResultado[0];
             }
             return $vResultado;
         } catch (Exception $e) {
             handleException($e);
         }
     }
-    //Servicios activos que ofrece una sucursal (tabla branch_services)
-    //Se manda la duración y el precio para mostrarlos al escoger el servicio en la reserva
+    //servicios activos de una sucursal (tabla branch_services)
+    //va la duración y el precio para mostrarlos en la reserva
     public function getByBranch($idBranch)
     {
         try {
@@ -64,7 +64,7 @@ class ServiceModel
             handleException($e);
         }
     }
-    //Revisar si ya hay otro servicio con ese nombre (al modificar no se compara consigo mismo)
+    //ver si ya hay otro servicio con ese nombre (al editar no se compara consigo mismo)
     public function nameExists($name, $idService = 0)
     {
         try {
@@ -75,14 +75,11 @@ class ServiceModel
             handleException($e);
         }
     }
-    //Crear servicio
     public function create($objeto)
     {
         try {
-            //Consulta sql (el id es autoincrementable)
             $sql = "INSERT INTO services (name, description, price, duration_minutes, modality, requirements)
                     VALUES (?, ?, ?, ?, ?, ?);";
-            //Ejecutar la consulta y obtener el id del servicio creado
             $idService = $this->enlace->executeSQL_DML_last($sql, [
                 $objeto->name,
                 $objeto->description,
@@ -91,13 +88,12 @@ class ServiceModel
                 $objeto->modality,
                 $objeto->requirements,
             ]);
-            //Retornar el servicio
             return $this->get($idService);
         } catch (Exception $e) {
             handleException($e);
         }
     }
-    //Actualizar servicio (el id viene dentro del objeto)
+    //el id viene dentro del objeto
     public function update($objeto)
     {
         try {
@@ -114,7 +110,6 @@ class ServiceModel
                 $objeto->requirements,
                 $objeto->id,
             ]);
-            //Retornar el servicio
             return $this->get($objeto->id);
         } catch (Exception $e) {
             handleException($e);

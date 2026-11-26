@@ -6,7 +6,7 @@ class CategoryModel
     {
         $this->enlace = new MySqlConnect(); //Conectarse a la BD
     }
-    //Categorías activas (son las que salen en el select del formulario de productos)
+    //categorías activas, las que salen en el select de productos
     public function all()
     {
         try {

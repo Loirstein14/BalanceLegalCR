@@ -18,22 +18,18 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import InvoiceService from '../../services/InvoiceService';
 import { DollarTotal } from './DollarTotal';
 
-//Formato de moneda en colones con dos decimales
+//colones con dos decimales
 const money = (value) =>
   '₡' + Number(value).toLocaleString('es-CR', { minimumFractionDigits: 2 });
 
-//Detalle de una factura: encabezado, detalle y totales
+//detalle de una factura: encabezado, líneas y totales
 export function DetailInvoice() {
-  const routeParams = useParams(); //Obtener el id de la factura de la ruta
-  const navigate = useNavigate(); //Para regresar a la página anterior
-  //Resultado de consumo del API, respuesta
+  const routeParams = useParams();
+  const navigate = useNavigate();
   const [data, setData] = useState(null);
-  //Error del API
   const [error, setError] = useState('');
-  //Booleano para establecer sí se ha recibido respuesta
   const [loaded, setLoaded] = useState(false);
 
-  //Llamar al API y obtener una factura
   useEffect(() => {
     InvoiceService.getInvoiceById(routeParams.id)
       .then((response) => {
@@ -56,7 +52,7 @@ export function DetailInvoice() {
     <Container component="main" maxWidth="md" sx={{ mt: 4, mb: 2 }}>
       {data && (
         <Paper elevation={3} sx={{ p: { xs: 2, md: 4 } }}>
-          {/* ===== Sector encabezado ===== */}
+          {/* encabezado */}
           <Grid container spacing={2} sx={{ alignItems: 'flex-start' }}>
             <Grid size={{ xs: 12, sm: 7 }}>
               <Typography variant="h5" component="h1" color="secondary" sx={{ fontWeight: 'bold' }}>
@@ -91,7 +87,7 @@ export function DetailInvoice() {
           <Typography variant="body2">Identificación: {data.client_id_number}</Typography>
           <Typography variant="body2">Correo: {data.client_email}</Typography>
 
-          {/* ===== Sector detalle ===== */}
+          {/* detalle */}
           <TableContainer sx={{ mt: 3 }}>
             <Table size="small">
               <TableHead>
@@ -118,7 +114,7 @@ export function DetailInvoice() {
             </Table>
           </TableContainer>
 
-          {/* ===== Sector totales ===== */}
+          {/* totales */}
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
             <Box sx={{ minWidth: 280 }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -134,7 +130,7 @@ export function DetailInvoice() {
                 <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Total a pagar</Typography>
                 <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{money(data.total)}</Typography>
               </Box>
-              {/* Total en dólares (web service de Hacienda) */}
+              {/* total en dólares (web service de Hacienda) */}
               <Box sx={{ mt: 1 }}>
                 <DollarTotal total={Number(data.total)} />
               </Box>

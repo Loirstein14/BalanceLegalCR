@@ -1,6 +1,6 @@
 <?php
-//Los encargados son usuarios con role_id = 2 (Encargado en la tabla roles).
-//Un encargado pertenece a una sola sucursal: eso se guarda en users.branch_id
+//los encargados son users con role_id = 2
+//un encargado es de una sola sucursal, se guarda en users.branch_id
 class BranchModel
 {
     public $enlace;
@@ -8,7 +8,7 @@ class BranchModel
     {
         $this->enlace = new MySqlConnect(); //Conectarse a la BD
     }
-    //Todas las sucursales con la cantidad de encargados (para la tabla de mantenimiento)
+    //sucursales con la cantidad de encargados para la tabla
     public function all()
     {
         try {
@@ -24,7 +24,7 @@ class BranchModel
             handleException($e);
         }
     }
-    //Una sucursal por id, junto con la lista de sus encargados
+    //sucursal por id con sus encargados
     public function get($id)
     {
         try {
@@ -33,7 +33,6 @@ class BranchModel
             $vResultado = $this->enlace->ExecuteSQL($vSql, [$id]);
             if (!empty($vResultado)) {
                 $vResultado = $vResultado[0];
-                //Encargados de la sucursal
                 $vResultado->managers = $this->getManagersBranch($id);
             }
             return $vResultado;
@@ -41,7 +40,7 @@ class BranchModel
             handleException($e);
         }
     }
-    //Encargados asignados a una sucursal
+    //encargados de una sucursal
     public function getManagersBranch($idBranch)
     {
         try {
@@ -50,14 +49,14 @@ class BranchModel
                      WHERE branch_id = ? AND role_id = 2
                      ORDER BY first_name, last_name;";
             $vResultado = $this->enlace->ExecuteSQL($vSql, [$idBranch]);
-            //Si no tiene encargados se devuelve la lista vacía
+            //si no tiene encargados va la lista vacía
             return $vResultado ?? [];
         } catch (Exception $e) {
             handleException($e);
         }
     }
-    //Encargados que se pueden escoger en el formulario: los que no tienen sucursal
-    //y, si se está modificando una sucursal, también los que ya son de esa sucursal
+    //encargados que se pueden escoger: los que no tienen sucursal
+    //y si se está editando, también los que ya son de esa sucursal
     public function availableManagers($idBranch = 0)
     {
         try {
@@ -72,7 +71,7 @@ class BranchModel
             handleException($e);
         }
     }
-    //Revisar si ya hay otra sucursal con ese nombre (al modificar no se compara consigo misma)
+    //ver si ya hay otra sucursal con ese nombre (al editar no se compara con ella misma)
     public function nameExists($name, $idBranch = 0)
     {
         try {
@@ -83,14 +82,11 @@ class BranchModel
             handleException($e);
         }
     }
-    //Crear sucursal
     public function create($objeto)
     {
         try {
-            //Consulta sql (el id es autoincrementable)
             $sql = "INSERT INTO branches (name, description, address, phone, email)
                     VALUES (?, ?, ?, ?, ?);";
-            //Ejecutar la consulta y obtener el id de la sucursal creada
             $idBranch = $this->enlace->executeSQL_DML_last($sql, [
                 $objeto->name,
                 $objeto->description,
@@ -98,21 +94,19 @@ class BranchModel
                 $objeto->phone,
                 $objeto->email,
             ]);
-            //--- Encargados ---
-            //Con el id de la sucursal se le asigna cada encargado escogido
-            //(solo si sigue sin sucursal, para no quitárselo a otra)
+            //encargados: a cada uno se le pone el id de la sucursal
+            //solo si sigue sin sucursal, para no quitárselo a otra
             foreach ($objeto->managers as $idManager) {
                 $sql = "UPDATE users SET branch_id = ?
                         WHERE id = ? AND role_id = 2 AND branch_id IS NULL;";
                 $vResultadoM = $this->enlace->executeSQL_DML($sql, [$idBranch, $idManager]);
             }
-            //Retornar sucursal
             return $this->get($idBranch);
         } catch (Exception $e) {
             handleException($e);
         }
     }
-    //Actualizar sucursal (el id viene dentro del objeto)
+    //el id viene dentro del objeto
     public function update($objeto)
     {
         try {
@@ -127,9 +121,8 @@ class BranchModel
                 $objeto->email,
                 $objeto->id,
             ]);
-            //--- Encargados ---
-            //Igual que con los géneros de las películas: primero se quitan los que tenía
-            //(quedan sin sucursal) y luego se asignan los que vienen del formulario
+            //encargados: igual que los géneros de las películas, primero se sueltan
+            //los que tenía y luego se asignan los que vienen del form
             $sql = "UPDATE users SET branch_id = NULL WHERE branch_id = ? AND role_id = 2;";
             $vResultadoD = $this->enlace->executeSQL_DML($sql, [$objeto->id]);
             foreach ($objeto->managers as $idManager) {
@@ -137,7 +130,6 @@ class BranchModel
                         WHERE id = ? AND role_id = 2 AND branch_id IS NULL;";
                 $vResultadoM = $this->enlace->executeSQL_DML($sql, [$objeto->id, $idManager]);
             }
-            //Retornar sucursal
             return $this->get($objeto->id);
         } catch (Exception $e) {
             handleException($e);

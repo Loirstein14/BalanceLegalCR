@@ -25,18 +25,17 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import GavelIcon from '@mui/icons-material/Gavel';
 import ServiceService from '../../services/ServiceService';
 
-//Tabla de mantenimiento de servicios: listar, buscar por nombre, ver detalle, crear y modificar
+//tabla de servicios: listar, buscar por nombre, ver detalle, crear y editar
 export default function TableServices() {
-  //Url para llegar a las imágenes que están en el API
+  //url de las imágenes que están en el API
   const IMG_URL = import.meta.env.VITE_BASE_URL + 'uploads';
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
   const [loaded, setLoaded] = useState(false);
-  const [search, setSearch] = useState(''); //Lo que se escribe en el buscador
+  const [search, setSearch] = useState(''); //lo que se escribe en el buscador
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  //Llamar al API para traer la lista de servicios
   useEffect(() => {
     ServiceService.getServices()
       .then((response) => {
@@ -53,7 +52,7 @@ export default function TableServices() {
   if (!loaded) return <p>Cargando...</p>;
   if (error) return <p>Error: {error.message}</p>;
 
-  //Servicios que coinciden con lo que se buscó (sin importar mayúsculas)
+  //los que coinciden con lo que se buscó, sin importar mayúsculas
   const filtered = (data ?? []).filter((s) => s.name.toLowerCase().includes(search.trim().toLowerCase()));
 
   return (

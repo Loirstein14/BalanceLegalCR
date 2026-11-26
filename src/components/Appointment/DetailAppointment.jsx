@@ -17,18 +17,14 @@ import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import AppointmentService from '../../services/AppointmentService';
 
-//Detalle de una reserva (cita)
+//detalle de una reserva
 export function DetailAppointment() {
-  const routeParams = useParams(); //Obtener el id de la reserva de la ruta
-  const navigate = useNavigate(); //Para regresar a la página anterior
-  //Resultado de consumo del API, respuesta
+  const routeParams = useParams();
+  const navigate = useNavigate();
   const [data, setData] = useState(null);
-  //Error del API
   const [error, setError] = useState('');
-  //Booleano para establecer sí se ha recibido respuesta
   const [loaded, setLoaded] = useState(false);
 
-  //Llamar al API y obtener una reserva
   useEffect(() => {
     AppointmentService.getAppointmentById(routeParams.id)
       .then((response) => {
@@ -47,7 +43,7 @@ export function DetailAppointment() {
   if (!loaded) return <p>Cargando...</p>;
   if (error) return <p>Error: {error.message}</p>;
 
-  //Fila etiqueta: valor
+  //fila etiqueta: valor
   const field = (label, value) => (
     <Typography variant="body1" sx={{ mb: 0.5 }}>
       <Box component="span" sx={{ fontWeight: 'bold' }}>
@@ -65,7 +61,7 @@ export function DetailAppointment() {
             <Typography variant="h5" component="h1" color="secondary" sx={{ fontWeight: 'bold' }}>
               Reserva #{data.id}
             </Typography>
-            {/* Estado con su color, que viene de la BD */}
+            {/* el color del estado viene de la BD */}
             <Chip
               label={data.status}
               sx={{ backgroundColor: data.status_color, color: 'common.white', fontWeight: 'bold' }}

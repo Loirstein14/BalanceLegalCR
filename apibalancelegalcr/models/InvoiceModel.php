@@ -6,9 +6,9 @@ class InvoiceModel
     {
         $this->enlace = new MySqlConnect(); //Conectarse a la BD
     }
-    //Facturas de una sucursal (la del encargado), de la más reciente a la más antigua
-    //Fecha de la factura: fecha de emisión si ya está facturada, si no la de creación (proforma)
-    //status_id, client_id e invoice_datetime se ocupan en React para el estado y los filtros
+    //facturas de la sucursal del encargado, la más nueva primero
+    //fecha: la de emisión si ya está facturada, si no la de creación (proforma)
+    //status_id, client_id e invoice_datetime los ocupa react para el estado y los filtros
     public function getByBranch($idBranch)
     {
         try {
@@ -31,12 +31,12 @@ class InvoiceModel
             handleException($e);
         }
     }
-    //Obtener una factura por su id: encabezado, líneas de detalle y totales
+    //factura por id con sus líneas y totales
     public function get($id)
     {
         try {
-            $itemM = new InvoiceItemModel(); //Instanciar el modelo de líneas de factura
-            //status_id, client_id, branch_id y appointment_id se ocupan para facturar una proforma
+            $itemM = new InvoiceItemModel();
+            //status_id, client_id, branch_id y appointment_id se ocupan al facturar una proforma
             $vSql = "SELECT i.id, i.status_id, i.client_id, i.branch_id, i.appointment_id,
                             COALESCE(i.invoice_number, CONCAT('Proforma #', i.id)) AS number,
                             s.name AS status,
@@ -56,8 +56,8 @@ class InvoiceModel
                        AND i.id = ?;";
             $vResultado = $this->enlace->ExecuteSQL($vSql, [$id]);
             if (!empty($vResultado)) {
-                $vResultado = $vResultado[0]; //Encabezado de la factura
-                //Líneas de detalle --items
+                $vResultado = $vResultado[0];
+                //líneas de detalle --items
                 $vResultado->items = $itemM->getByInvoice($vResultado->id);
             }
             return $vResultado;
@@ -65,7 +65,7 @@ class InvoiceModel
             handleException($e);
         }
     }
-    //Porcentaje de impuesto del negocio (business_settings, 13 %)
+    //% de impuesto del negocio (business_settings, 13)
     public function getTaxRate()
     {
         try {
@@ -75,8 +75,8 @@ class InvoiceModel
             handleException($e);
         }
     }
-    //Siguiente número de factura: FAC-0001, FAC-0002, ...
-    //Toma el número más alto que ya existe (lo que va después de 'FAC-') y le suma 1
+    //siguiente número: FAC-0001, FAC-0002...
+    //agarra el número más alto después de 'FAC-' y le suma 1
     public function nextNumber()
     {
         try {
@@ -89,10 +89,10 @@ class InvoiceModel
             handleException($e);
         }
     }
-    //Calcular las líneas y los totales con los precios de la BD (no con lo que mande React)
+    //calcula las líneas y los totales con los precios de la BD, no con lo que mande react
     //$items: [{product_id o service_id, quantity}]
-    //Cada línea: subtotal = precio x cantidad, impuesto = subtotal x 13 %, total = subtotal + impuesto
-    //Totales de la factura = suma de las líneas
+    //por línea: subtotal = precio x cantidad, impuesto = subtotal x 13%, total = subtotal + impuesto
+    //los totales de la factura son la suma de las líneas
     public function calculateLines($items)
     {
         try {
@@ -103,7 +103,7 @@ class InvoiceModel
             $subtotal = 0;
             $taxTotal = 0;
             foreach ($items as $item) {
-                //Producto o servicio: de ahí salen el nombre y el precio de este momento
+                //de aquí salen el nombre y el precio de este momento
                 if (!empty($item->product_id)) {
                     $row = $productM->get($item->product_id);
                 } else {
@@ -135,7 +135,7 @@ class InvoiceModel
             handleException($e);
         }
     }
-    //Guardar las líneas de una factura (se copia el nombre, el precio y el impuesto de este momento)
+    //guardar las líneas (se copia el nombre, precio e impuesto de este momento)
     public function createItems($idInvoice, $lines)
     {
         try {
@@ -153,34 +153,31 @@ class InvoiceModel
             handleException($e);
         }
     }
-    //Crear la factura proforma de una reserva: una línea con el servicio, cantidad 1
-    //invoice_number, issued_by e issued_at quedan en NULL hasta que se facture
+    //proforma de una reserva: una línea con el servicio, cantidad 1
+    //número, emisor y fecha de emisión quedan en NULL hasta que se facture
     public function createProforma($idAppointment, $idClient, $idBranch, $service)
     {
         try {
-            //Misma forma de calcular que una factura normal
+            //se calcula igual que una factura normal
             $calc = $this->calculateLines([(object) ['service_id' => $service->id, 'quantity' => 1]]);
-            //Encabezado: estado 1 = Proforma
+            //estado 1 = proforma
             $sql = "INSERT INTO invoices (appointment_id, client_id, branch_id, status_id, subtotal, tax_total, total)
                     VALUES (?, ?, ?, 1, ?, ?, ?);";
             $idInvoice = $this->enlace->executeSQL_DML_last($sql, [
                 $idAppointment, $idClient, $idBranch, $calc->subtotal, $calc->tax_total, $calc->total,
             ]);
-            //Línea del servicio
             $this->createItems($idInvoice, $calc->lines);
             return $idInvoice;
         } catch (Exception $e) {
             handleException($e);
         }
     }
-    //Crear factura ya facturada (estado 2), con su número, quién la emitió y la fecha de hoy
-    //$manager trae la sucursal y el id del encargado que la emite
+    //factura nueva ya facturada (estado 2) con número, quién la emite y la fecha de hoy
+    //$manager trae la sucursal y el id del encargado
     public function create($objeto, $manager)
     {
         try {
-            //Líneas y totales calculados con los precios de la BD
             $calc = $this->calculateLines($objeto->items);
-            //Encabezado
             $sql = "INSERT INTO invoices
                         (invoice_number, client_id, branch_id, status_id, issued_by, issued_at,
                          subtotal, tax_total, total)
@@ -189,22 +186,19 @@ class InvoiceModel
                 $this->nextNumber(), $objeto->client_id, $manager->branch_id, $manager->id,
                 $calc->subtotal, $calc->tax_total, $calc->total,
             ]);
-            //Líneas de detalle
             $this->createItems($idInvoice, $calc->lines);
-            //Retornar la factura creada
             return $this->get($idInvoice);
         } catch (Exception $e) {
             handleException($e);
         }
     }
-    //Facturar una proforma: pasa a Facturado (estado 2) con su número, quién la emite y la fecha de hoy
-    //Las líneas se reemplazan por las del formulario (se borran las de la proforma y se insertan las nuevas)
+    //facturar proforma: pasa a facturado (2) con su número, quién la emite y la fecha
+    //las líneas se cambian por las del form (se borran y se meten las nuevas)
     public function issueProforma($idInvoice, $objeto, $manager)
     {
         try {
-            //Líneas y totales calculados con los precios de la BD
             $calc = $this->calculateLines($objeto->items);
-            //Encabezado (status_id = 1 en el WHERE: solo se factura si todavía es proforma)
+            //el status_id = 1 en el WHERE es para que solo se facture si todavía es proforma
             $sql = "UPDATE invoices
                     SET invoice_number = ?, status_id = 2, issued_by = ?, issued_at = NOW(),
                         subtotal = ?, tax_total = ?, total = ?
@@ -214,12 +208,10 @@ class InvoiceModel
                 $calc->subtotal, $calc->tax_total, $calc->total,
                 $idInvoice,
             ]);
-            //Borrar la pila: quitar las líneas de la proforma
+            //borrar la pila: se quitan las líneas de la proforma
             $sql = "DELETE FROM invoice_items WHERE invoice_id = ?;";
             $this->enlace->executeSQL_DML($sql, [$idInvoice]);
-            //Insertar las líneas nuevas
             $this->createItems($idInvoice, $calc->lines);
-            //Retornar la factura
             return $this->get($idInvoice);
         } catch (Exception $e) {
             handleException($e);

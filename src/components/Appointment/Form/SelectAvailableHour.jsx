@@ -8,8 +8,8 @@ SelectAvailableHour.propTypes = {
   field: PropTypes.object,
   disabled: PropTypes.bool,
 };
-//Horas disponibles que calcula el API (ya respetan la duración, el horario, los bloqueos y las otras citas)
-//Se guarda la hora de inicio y se muestra el rango completo, por ejemplo "10:00 - 12:00"
+//horas libres que calcula el API (ya respetan duración, horario, bloqueos y otras citas)
+//se guarda la hora de inicio y se muestra el rango, ej "10:00 - 12:00"
 export function SelectAvailableHour({ field, data, disabled }) {
   return (
     <>

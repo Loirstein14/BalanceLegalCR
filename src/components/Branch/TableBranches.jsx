@@ -20,7 +20,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import BranchService from '../../services/BranchService';
 
-//Tabla de mantenimiento de sucursales: listar, ver detalle, crear y modificar
+//tabla de sucursales: listar, ver detalle, crear y editar
 export default function TableBranches() {
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
@@ -28,7 +28,6 @@ export default function TableBranches() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  //Llamar al API para traer la lista de sucursales
   useEffect(() => {
     BranchService.getBranches()
       .then((response) => {
@@ -76,7 +75,7 @@ export default function TableBranches() {
                   <TableCell>{row.phone}</TableCell>
                   <TableCell>{row.email}</TableCell>
                   <TableCell align="center">
-                    {/* Si no tiene encargados se marca para que se note */}
+                    {/* si no tiene encargados se marca para que se note */}
                     <Chip
                       size="small"
                       label={row.managers_count}

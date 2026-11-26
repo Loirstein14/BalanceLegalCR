@@ -1,9 +1,9 @@
 import axios from 'axios';
-//Ruta del API para las preguntas del formulario de reserva
+//ruta del API para las preguntas de la reserva
 const BASE_URL = import.meta.env.VITE_BASE_URL + 'question';
 
 class QuestionService {
-  //Preguntas activas del negocio, en orden
+  //preguntas activas, en orden
   //localhost/appbalancelegalcr/apibalancelegalcr/question
   getQuestions() {
     return axios.get(BASE_URL);

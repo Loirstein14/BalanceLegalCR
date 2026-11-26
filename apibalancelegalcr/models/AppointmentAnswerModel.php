@@ -6,7 +6,7 @@ class AppointmentAnswerModel
     {
         $this->enlace = new MySqlConnect(); //Conectarse a la BD
     }
-    //Obtener las preguntas de la reserva con sus respuestas
+    //preguntas de la reserva con sus respuestas
     public function getByAppointment($idAppointment)
     {
         try {
@@ -21,7 +21,7 @@ class AppointmentAnswerModel
             handleException($e);
         }
     }
-    //Guardar la respuesta de una pregunta de la reserva
+    //guardar la respuesta de una pregunta
     public function create($idAppointment, $idQuestion, $answerText)
     {
         try {

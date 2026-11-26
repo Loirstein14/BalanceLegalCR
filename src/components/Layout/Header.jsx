@@ -14,14 +14,14 @@ import ListSubheader from '@mui/material/ListSubheader';
 import { Link } from 'react-router-dom';
 import logoBlanco from '../../assets/logo-balance-legal-blanco.png';
 
-//Lista enlaces menu principal
+//enlaces del menú principal
 const navItems = [
-  { name: 'Productos', link: '/product' }, //Catálogo de productos (cards)
-  { name: 'Facturas', link: '/invoice' }, //Historial de facturas
-  { name: 'Reservas', link: '/appointment' }, //Historial de reservas del encargado
+  { name: 'Productos', link: '/product' }, //catálogo en cards
+  { name: 'Facturas', link: '/invoice' },
+  { name: 'Reservas', link: '/appointment' },
 ];
 
-//Submenú de mantenimientos (las tablas para listar, crear y modificar)
+//submenú de mantenimientos (las tablas para listar, crear y editar)
 const maintenanceItems = [
   { name: 'Productos', link: '/product-table' },
   { name: 'Servicios', link: '/service-table' },
@@ -31,19 +31,17 @@ const maintenanceItems = [
 ];
 
 export default function Header() {
-  //Gestión menu principal responsivo
+  //menú principal responsivo
   const [anchorElPrincipal, setAnchorElPrincipal] = React.useState(null);
 
-  //Abierto menu principal
   const handleOpenPrincipalMenu = (event) => {
     setAnchorElPrincipal(event.currentTarget);
   };
-  //Cerrado menu principal
   const handleClosePrincipalMenu = () => {
     setAnchorElPrincipal(null);
   };
 
-  //Abrir y cerrar el submenú de mantenimientos (pantallas grandes)
+  //abrir y cerrar el submenú de mantenimientos (pantallas grandes)
   const [anchorElMaintenance, setAnchorElMaintenance] = React.useState(null);
   const handleCloseMaintenanceMenu = () => {
     setAnchorElMaintenance(null);
@@ -53,7 +51,7 @@ export default function Header() {
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static" color="primary">
         <Toolbar>
-          {/* Menu principal responsivo (pantallas pequeñas) */}
+          {/* menú para pantallas pequeñas */}
           <IconButton
             size="large"
             color="inherit"
@@ -87,7 +85,6 @@ export default function Header() {
             ))}
           </Menu>
 
-          {/* Enlace página inicio */}
           <Tooltip title="Inicio">
             <Button
               component={Link}
@@ -102,14 +99,13 @@ export default function Header() {
             </Button>
           </Tooltip>
 
-          {/* Menu principal (pantallas grandes) */}
+          {/* menú para pantallas grandes */}
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             {navItems.map((item, index) => (
               <Button key={index} component={Link} to={item.link} color="inherit">
                 {item.name}
               </Button>
             ))}
-            {/* Submenú de mantenimientos */}
             <Button
               color="inherit"
               endIcon={<ArrowDropDownIcon />}

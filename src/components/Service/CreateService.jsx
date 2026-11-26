@@ -17,7 +17,7 @@ import { SelectDuration } from './Form/SelectDuration';
 
 export function CreateService() {
   const navigate = useNavigate();
-  // Esquema de validación
+  //validaciones
   const serviceSchema = yup.object({
     name: yup
       .string()
@@ -54,14 +54,12 @@ export function CreateService() {
       modality: '',
       requirements: '',
     },
-    // Asignación de validaciones
     resolver: yupResolver(serviceSchema),
   });
 
-  // Si ocurre error al realizar el submit
   const onError = (errors, e) => console.log(errors, e);
 
-  //Imagen escogida y su vista previa (igual que en MovieUploadImage)
+  //imagen escogida y su vista previa (igual que en MovieUploadImage)
   const [file, setFile] = useState(null);
   const [fileURL, setFileURL] = useState(null);
   function handleChange(e) {
@@ -70,7 +68,7 @@ export function CreateService() {
       setFile(e.target.files[0]);
     }
   }
-  //La imagen se sube después de crear el servicio, porque ocupa el id
+  //la imagen se sube después de crear el servicio porque ocupa el id
   const saveImage = (idService) => {
     if (!file) {
       return navigate('/service-table');
@@ -83,21 +81,18 @@ export function CreateService() {
       .then(() => navigate('/service-table'))
       .catch((error) => {
         console.log(error);
-        //El servicio sí se creó, entonces se manda a modificar para intentar de nuevo con la imagen
+        //el servicio sí se creó, entonces se manda a editar para volver a intentar con la imagen
         toast.error(typeof error.response?.data === 'string' ? error.response.data : 'No se pudo subir la imagen');
         navigate(`/service/update/${idService}`);
       });
   };
 
-  // Accion submit
   const onSubmit = (DataForm) => {
     console.log('Formulario:');
     console.log(DataForm);
     try {
-      //Crear servicio
       ServiceService.createService(DataForm)
         .then((response) => {
-          //Respuesta al usuario
           if (response.data != null) {
             toast.success(`Servicio creado #${response.data.id} - ${response.data.name}`, {
               duration: 4000,
@@ -108,7 +103,7 @@ export function CreateService() {
         })
         .catch((error) => {
           console.log(error);
-          //Si el API manda un mensaje (por ejemplo, nombre repetido) se le muestra al usuario
+          //si el API manda un mensaje (ej nombre repetido) se le enseña al usuario
           toast.error(
             typeof error.response?.data === 'string' && error.response.data
               ? error.response.data
@@ -131,7 +126,6 @@ export function CreateService() {
           </Grid>
           <Grid size={{ xs: 12, sm: 8 }}>
             <FormControl variant="standard" fullWidth sx={{ m: 1 }}>
-              {/* Controlador y entrada de formulario name */}
               <Controller
                 name="name"
                 control={control}
@@ -185,7 +179,6 @@ export function CreateService() {
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
             <FormControl variant="standard" fullWidth sx={{ m: 1 }}>
-              {/* Lista de duraciones */}
               <Controller
                 name="duration_minutes"
                 control={control}
@@ -198,7 +191,6 @@ export function CreateService() {
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
             <FormControl variant="standard" fullWidth sx={{ m: 1 }}>
-              {/* Lista de modalidades */}
               <Controller
                 name="modality"
                 control={control}
@@ -229,7 +221,7 @@ export function CreateService() {
             </FormControl>
           </Grid>
           <Grid size={12}>
-            {/* Imagen (opcional): se sube con FormData después de guardar */}
+            {/* imagen opcional, se sube con FormData después de guardar */}
             <FormControl variant="standard" fullWidth sx={{ m: 1 }}>
               <Typography variant="subtitle1">Imagen (JPG, PNG o GIF, máximo 2 MB)</Typography>
               <input type="file" accept="image/*" onChange={handleChange} />

@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 SelectDuration.propTypes = {
   field: PropTypes.object,
 };
-//Duración del servicio: bloques de 1 o 2 horas (como lo pidió el profe), se guarda en minutos
+//duración: bloques de 1 o 2 horas como pidió el profe, se guarda en minutos
 export function SelectDuration({ field }) {
   return (
     <>

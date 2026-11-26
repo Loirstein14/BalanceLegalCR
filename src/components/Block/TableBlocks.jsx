@@ -24,17 +24,16 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import BlockService from '../../services/BlockService';
 import BranchService from '../../services/BranchService';
 
-//Tabla de mantenimiento de bloqueos (horas en que la sucursal no atiende): se puede filtrar por sucursal
+//tabla de bloqueos (horas en que la sucursal no atiende), se puede filtrar por sucursal
 export default function TableBlocks() {
   const [data, setData] = useState([]);
   const [error, setError] = useState('');
   const [loaded, setLoaded] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  //Sucursal escogida en el filtro ('' = todas)
+  //sucursal del filtro, '' son todas
   const [branchId, setBranchId] = useState('');
 
-  //Lista de sucursales para el filtro
   const [dataBranches, setDataBranches] = useState([]);
   useEffect(() => {
     BranchService.getBranches()
@@ -47,7 +46,7 @@ export default function TableBlocks() {
       });
   }, []);
 
-  //Llamar al API: todos los bloqueos o solo los de la sucursal escogida
+  //todos los bloqueos o solo los de la sucursal escogida
   useEffect(() => {
     const request = branchId ? BlockService.getBlocksByBranch(branchId) : BlockService.getBlocks();
     request
@@ -56,7 +55,7 @@ export default function TableBlocks() {
         setLoaded(true);
       })
       .catch((error) => {
-        //Si la sucursal no tiene bloqueos el API responde con error: la tabla queda vacía
+        //si la sucursal no tiene bloqueos el API da error y la tabla queda vacía
         console.log(error);
         setData([]);
         setLoaded(true);
@@ -74,7 +73,6 @@ export default function TableBlocks() {
           <Typography sx={{ flex: '1 1 auto' }} variant="h6" component="div">
             Mantenimiento de Bloqueos
           </Typography>
-          {/* Filtro por sucursal */}
           <FormControl size="small" sx={{ minWidth: 220 }}>
             <InputLabel id="filter-branch">Sucursal</InputLabel>
             <Select

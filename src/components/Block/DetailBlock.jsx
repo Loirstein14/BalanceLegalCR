@@ -14,15 +14,14 @@ import NotesIcon from '@mui/icons-material/Notes';
 import PersonIcon from '@mui/icons-material/Person';
 import BlockService from '../../services/BlockService';
 
-//Detalle de un bloqueo
+//detalle de un bloqueo
 export function DetailBlock() {
-  const routeParams = useParams(); //Id del bloqueo que viene en la ruta
+  const routeParams = useParams();
   const navigate = useNavigate();
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
   const [loaded, setLoaded] = useState(false);
 
-  //Llamar al API para traer el bloqueo
   useEffect(() => {
     BlockService.getBlockById(routeParams.id)
       .then((response) => {

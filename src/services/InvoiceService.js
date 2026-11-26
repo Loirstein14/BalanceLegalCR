@@ -1,28 +1,27 @@
 import axios from 'axios';
-//Ruta del API para las facturas
+//ruta del API para las facturas
 const BASE_URL = import.meta.env.VITE_BASE_URL + 'invoice';
 
 class InvoiceService {
-  //Facturas de la sucursal del encargado (más reciente primero)
+  //facturas de la sucursal del encargado, la más nueva primero
   //localhost/appbalancelegalcr/apibalancelegalcr/invoice
   getInvoices() {
     return axios.get(BASE_URL);
   }
-  //Obtener una factura por su id
   //localhost/appbalancelegalcr/apibalancelegalcr/invoice/1
   getInvoiceById(InvoiceId) {
     return axios.get(BASE_URL + '/' + InvoiceId);
   }
-  //Encabezado de la factura: encargado, sucursal y % de impuesto
+  //encabezado: encargado, sucursal y % de impuesto
   //localhost/appbalancelegalcr/apibalancelegalcr/invoice/header
   getHeader() {
     return axios.get(BASE_URL + '/header');
   }
-  //Crear factura (el API calcula los totales con los precios de la BD)
+  //crear factura, los totales los calcula el API con los precios de la BD
   createInvoice(Invoice) {
     return axios.post(BASE_URL, JSON.stringify(Invoice));
   }
-  //Facturar una proforma (el id va dentro del objeto, con las líneas)
+  //facturar una proforma, el id va dentro del objeto con las líneas
   issueProforma(Invoice) {
     return axios({
       method: 'put',

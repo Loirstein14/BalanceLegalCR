@@ -6,12 +6,12 @@ class AppointmentModel
     {
         $this->enlace = new MySqlConnect(); //Conectarse a la BD
     }
-    //Obtener las reservas de la sucursal de un encargado (más reciente primero)
-    //La sucursal sale del encargado: users.branch_id
+    //reservas de la sucursal del encargado, la más nueva primero
+    //la sucursal sale de users.branch_id
     public function getByManager($idManager)
     {
         try {
-            //client_id y starts_at se ocupan en React para los filtros por cliente y por fecha
+            //client_id y starts_at los ocupa react para los filtros
             $vSql = "SELECT a.id, a.starts_at, a.client_id,
                             DATE_FORMAT(a.starts_at, '%d/%m/%Y') AS appointment_date,
                             CONCAT(DATE_FORMAT(a.starts_at, '%H:%i'), ' - ', DATE_FORMAT(a.ends_at, '%H:%i')) AS time_range,
@@ -33,11 +33,11 @@ class AppointmentModel
             handleException($e);
         }
     }
-    //Obtener una reserva por su id, con las preguntas y respuestas
+    //una reserva por id con sus preguntas y respuestas
     public function get($id)
     {
         try {
-            $answerM = new AppointmentAnswerModel(); //Instanciar el modelo de respuestas
+            $answerM = new AppointmentAnswerModel();
             $vSql = "SELECT a.id,
                             DATE_FORMAT(a.created_at, '%d/%m/%Y %H:%i') AS created_date,
                             DATE_FORMAT(a.starts_at, '%d/%m/%Y') AS appointment_date,
@@ -59,7 +59,7 @@ class AppointmentModel
             $vResultado = $this->enlace->ExecuteSQL($vSql, [$id]);
             if (!empty($vResultado)) {
                 $vResultado = $vResultado[0];
-                //Preguntas y respuestas --answers
+                //preguntas y respuestas --answers
                 $vResultado->answers = $answerM->getByAppointment($vResultado->id);
             }
             return $vResultado;
@@ -67,20 +67,19 @@ class AppointmentModel
             handleException($e);
         }
     }
-    //Horas disponibles para reservar un servicio en una sucursal y una fecha
-    //Una hora sirve si el servicio completo cabe dentro del horario de ese día,
-    //no choca con un bloqueo ni con otra cita activa, y (si la fecha es hoy) todavía no ha pasado
+    //horas libres para reservar un servicio en una fecha
+    //una hora sirve si el servicio completo cabe en el horario de ese día,
+    //no choca con un bloqueo ni con otra cita y si es hoy que no haya pasado
     public function availableHours($idBranch, $date, $idService)
     {
         try {
-            //Fecha y hora actual de MySQL (igual que en el Avance 4 se usa la BD como reloj)
+            //fecha y hora de MySQL, igual que en el avance 4 la BD es el reloj
             $vSql = "SELECT CURDATE() AS today, CURTIME() AS now_time;";
             $now = $this->enlace->ExecuteSQL($vSql)[0];
-            //Fecha pasada: no hay horas
             if ($date < $now->today) {
                 return [];
             }
-            //Duración del servicio, solo si la sucursal lo ofrece y está activo
+            //duración del servicio, solo si la sucursal lo ofrece y está activo
             $vSql = "SELECT s.duration_minutes
                      FROM services s, branch_services bs
                      WHERE bs.service_id = s.id
@@ -92,19 +91,19 @@ class AppointmentModel
                 return [];
             }
             $duration = $service[0]->duration_minutes;
-            //Horario de la sucursal ese día (puede tener más de un rango)
+            //horario de ese día (puede tener más de un rango)
             $vSql = "SELECT start_time, end_time
                      FROM branch_schedules
                      WHERE branch_id = ? AND schedule_date = ?
                      ORDER BY start_time;";
             $schedules = $this->enlace->ExecuteSQL($vSql, [$idBranch, $date]);
-            //Si ese día la sucursal no abre, no hay horas
-            //(cuando no hay filas, executeSQL devuelve null y no un arreglo vacío)
+            //si ese día no abre no hay horas
+            //ojo: si no hay filas executeSQL devuelve null, no un arreglo vacío
             if (empty($schedules)) {
                 return [];
             }
-            //Rangos ocupados ese día: los bloqueos y las citas activas
-            //Las citas Canceladas (5) y No asistió (6) ya no ocupan el espacio
+            //lo ocupado ese día: bloqueos y citas
+            //las canceladas (5) y no asistió (6) ya no ocupan campo
             $vSql = "SELECT start_time, end_time
                      FROM schedule_blocks
                      WHERE branch_id = ? AND block_date = ?
@@ -113,7 +112,6 @@ class AppointmentModel
                      FROM appointments
                      WHERE branch_id = ? AND DATE(starts_at) = ? AND status_id NOT IN (5, 6);";
             $busy = $this->enlace->ExecuteSQL($vSql, [$idBranch, $date, $idBranch, $date]);
-            //Día sin bloqueos ni citas: nada ocupado
             if (empty($busy)) {
                 $busy = [];
             }
@@ -122,16 +120,16 @@ class AppointmentModel
             foreach ($schedules as $schedule) {
                 $start = $this->toMinutes($schedule->start_time);
                 $end = $this->toMinutes($schedule->end_time);
-                //Una opción cada hora (los servicios duran 1 o 2 horas),
-                //mientras el servicio completo termine antes de que cierre el horario
+                //una opción cada hora (los servicios duran 1 o 2 horas)
+                //mientras el servicio completo termine antes de que cierre
                 for ($hour = $start; $hour + $duration <= $end; $hour += 60) {
                     $free = true;
-                    //Si es hoy, la hora tiene que ser después de la hora actual
+                    //si es hoy, la hora tiene que ser después de la hora actual
                     if ($date == $now->today && $hour <= $this->toMinutes($now->now_time)) {
                         $free = false;
                     }
-                    //Misma regla de traslape del Avance 4:
-                    //choca si empieza antes de que termine el otro y termina después de que empiece
+                    //misma regla de traslape del avance 4: choca si empieza antes de que
+                    //termine el otro y termina después de que empiece
                     foreach ($busy as $range) {
                         if ($hour < $this->toMinutes($range->end_time)
                             && $hour + $duration > $this->toMinutes($range->start_time)) {
@@ -152,7 +150,7 @@ class AppointmentModel
             handleException($e);
         }
     }
-    //Un estado de cita con su color (para mostrar el estado inicial en el formulario)
+    //un estado con su color, para mostrar el estado inicial en el form
     public function getStatus($idStatus)
     {
         try {
@@ -166,17 +164,17 @@ class AppointmentModel
             handleException($e);
         }
     }
-    //Crear reserva: la cita, sus respuestas y la factura proforma
-    //$manager trae la sucursal y el provider_id del encargado que registra la reserva
+    //crear reserva: la cita, sus respuestas y la proforma
+    //$manager trae la sucursal y el provider_id del encargado
     public function create($objeto, $manager, $idStatus)
     {
         try {
             $serviceM = new ServiceModel();
             $answerM = new AppointmentAnswerModel();
             $invoiceM = new InvoiceModel();
-            //Servicio: la duración define la hora final y el precio va en la proforma
+            //de aquí sale la duración y el precio para la proforma
             $service = $serviceM->get($objeto->service_id);
-            //Insertar la cita. La hora final la calcula MySQL: inicio + duración del servicio
+            //la hora final la calcula MySQL: inicio + duración del servicio
             $sql = "INSERT INTO appointments
                         (client_id, provider_id, branch_id, service_id, status_id, starts_at, ends_at, created_by)
                     VALUES (?, ?, ?, ?, ?, TIMESTAMP(?, ?), DATE_ADD(TIMESTAMP(?, ?), INTERVAL ? MINUTE), ?);";
@@ -191,13 +189,12 @@ class AppointmentModel
                 $service->duration_minutes,
                 $manager->id,
             ]);
-            //Respuestas de las preguntas del negocio
             foreach ($objeto->answers as $answer) {
                 $answerM->create($idAppointment, $answer->question_id, $answer->answer_text);
             }
-            //Factura proforma de la reserva (cliente, sucursal y el servicio x 1)
+            //proforma de la reserva (cliente, sucursal y el servicio x 1)
             $idInvoice = $invoiceM->createProforma($idAppointment, $objeto->client_id, $manager->branch_id, $service);
-            //Retornar la reserva creada, con el id de su proforma
+            //se devuelve la reserva con el id de su proforma
             $appointment = $this->get($idAppointment);
             $appointment->invoice_id = $idInvoice;
             return $appointment;
@@ -205,7 +202,7 @@ class AppointmentModel
             handleException($e);
         }
     }
-    //'09:30:00' -> 570 (minutos desde la medianoche), para poder sumar y comparar
+    //'09:30:00' -> 570 minutos, para poder sumar y comparar
     private function toMinutes($time)
     {
         $parts = explode(':', $time);

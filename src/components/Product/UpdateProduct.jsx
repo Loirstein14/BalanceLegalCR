@@ -19,19 +19,16 @@ import { SelectDeliveryFormat } from './Form/SelectDeliveryFormat';
 export function UpdateProduct() {
   const navigate = useNavigate();
   const routeParams = useParams();
-  //Id del producto a actualizar
   const id = routeParams.id || null;
-  //Url de las imágenes guardadas en el API
+  //url de las imágenes que están en el API
   const BASE_URL = import.meta.env.VITE_BASE_URL + 'uploads';
-  //Valores a precargar en el formulario, vienen del API
   const [values, setValores] = useState(null);
-  //Obtener el producto del API
   useEffect(() => {
     if (id != undefined && !isNaN(Number(id))) {
       ProductService.getProductById(id)
         .then((response) => {
           console.log(response.data);
-          //Dar formato: el formulario ocupa el código del formato de entrega, no el texto
+          //el form ocupa el código del formato de entrega, no el texto
           setValores({
             id: response.data.id,
             name: response.data.name,
@@ -41,7 +38,7 @@ export function UpdateProduct() {
             delivery_format: response.data.delivery_format_code,
             delivery_days: response.data.delivery_days,
           });
-          //Si ya tiene imagen se muestra
+          //si ya tiene imagen se enseña
           if (response.data.image_path) {
             setFileURL(`${BASE_URL}/${response.data.image_path}`);
           }
@@ -52,7 +49,7 @@ export function UpdateProduct() {
         });
     }
   }, [id, BASE_URL]);
-  // Esquema de validación
+  //validaciones
   const productSchema = yup.object({
     name: yup
       .string()
@@ -94,18 +91,14 @@ export function UpdateProduct() {
       delivery_format: '',
       delivery_days: '',
     },
-    //Valores a precargar en el formulario
     values,
-    // Asignación de validaciones
     resolver: yupResolver(productSchema),
   });
 
-  //Gestión de errores
   const [error, setError] = useState('');
-  // Si ocurre error al realizar el submit
   const onError = (errors, e) => console.log(errors, e);
 
-  //Imagen escogida y su vista previa (igual que en MovieUploadImage)
+  //imagen escogida y su vista previa (igual que en MovieUploadImage)
   const [file, setFile] = useState(null);
   const [fileURL, setFileURL] = useState(null);
   function handleChange(e) {
@@ -114,7 +107,7 @@ export function UpdateProduct() {
       setFile(e.target.files[0]);
     }
   }
-  //Si escogió otra imagen se sube después de guardar los datos
+  //si escogió otra imagen se sube después de guardar los datos
   const saveImage = (idProduct) => {
     if (!file) {
       return navigate('/product-table');
@@ -127,20 +120,18 @@ export function UpdateProduct() {
       .then(() => navigate('/product-table'))
       .catch((error) => {
         console.log(error);
-        //Los datos sí se guardaron, solo falló la imagen: se queda en el formulario para intentar de nuevo
+        //los datos sí se guardaron, solo falló la imagen, se queda en el form para volver a intentar
         toast.error(typeof error.response?.data === 'string' ? error.response.data : 'No se pudo subir la imagen');
       });
   };
 
-  // Accion submit
   const onSubmit = (DataForm) => {
     console.log('Formulario:');
     console.log(DataForm);
     try {
-      //Actualizar producto (DataForm trae el id porque viene en values)
+      //DataForm ya trae el id porque viene en values
       ProductService.updateProduct(DataForm)
         .then((response) => {
-          //Respuesta al usuario
           if (response.data != null) {
             toast.success(`Producto actualizado #${response.data.id} - ${response.data.name}`, {
               duration: 4000,
@@ -151,7 +142,7 @@ export function UpdateProduct() {
         })
         .catch((error) => {
           console.log(error);
-          //Si el API manda un mensaje (por ejemplo, nombre repetido) se le muestra al usuario
+          //si el API manda un mensaje (ej nombre repetido) se le enseña al usuario
           toast.error(
             typeof error.response?.data === 'string' && error.response.data
               ? error.response.data
@@ -163,7 +154,6 @@ export function UpdateProduct() {
     }
   };
 
-  //Lista de categorías
   const [dataCategory, setDataCategory] = useState({});
   const [loadedCategory, setLoadedCategory] = useState(false);
   useEffect(() => {
@@ -192,7 +182,6 @@ export function UpdateProduct() {
           </Grid>
           <Grid size={{ xs: 12, sm: 8 }}>
             <FormControl variant="standard" fullWidth sx={{ m: 1 }}>
-              {/* Controlador y entrada de formulario name */}
               <Controller
                 name="name"
                 control={control}
@@ -246,7 +235,6 @@ export function UpdateProduct() {
           </Grid>
           <Grid size={{ xs: 12, sm: 4 }}>
             <FormControl variant="standard" fullWidth sx={{ m: 1 }}>
-              {/* Lista de categorías */}
               {loadedCategory && (
                 <Controller
                   name="category_id"
@@ -289,7 +277,7 @@ export function UpdateProduct() {
             </FormControl>
           </Grid>
           <Grid size={12}>
-            {/* Imagen (opcional): si escoge otra, reemplaza la que tiene */}
+            {/* imagen opcional, si escoge otra se cambia la que tiene */}
             <FormControl variant="standard" fullWidth sx={{ m: 1 }}>
               <Typography variant="subtitle1">Imagen (JPG, PNG o GIF, máximo 2 MB)</Typography>
               <input type="file" accept="image/*" onChange={handleChange} />

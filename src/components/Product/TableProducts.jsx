@@ -26,7 +26,7 @@ import { visuallyHidden } from '@mui/utils';
 import { Link } from 'react-router-dom';
 import ProductService from '../../services/ProductService';
 
-//Ordenar descendente (los campos numéricos se comparan como número)
+//los campos numéricos se comparan como número
 function descendingComparator(a, b, orderBy) {
   const valueA = orderBy === 'price' ? Number(a[orderBy]) : a[orderBy];
   const valueB = orderBy === 'price' ? Number(b[orderBy]) : b[orderBy];
@@ -39,14 +39,12 @@ function descendingComparator(a, b, orderBy) {
   return 0;
 }
 
-//Comparar para ordenar
 function getComparator(order, orderBy) {
   return order === 'desc'
     ? (a, b) => descendingComparator(a, b, orderBy)
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
-//Ordenar estable
 function stableSort(array, comparator) {
   const stabilizedThis = array.map((el, index) => [el, index]);
   stabilizedThis.sort((a, b) => {
@@ -59,14 +57,14 @@ function stableSort(array, comparator) {
   return stabilizedThis.map((el) => el[0]);
 }
 
-//Encabezados de la tabla (máximo 4 campos)
+//encabezados, máximo 4 campos
 const headCells = [
   { id: 'name', numeric: false, label: 'Producto' },
   { id: 'category', numeric: false, label: 'Categoría' },
   { id: 'price', numeric: true, label: 'Precio' },
 ];
 
-//Encabezado de la tabla con ordenamiento
+//encabezado de la tabla con ordenamiento
 function TableProductsHead(props) {
   const { order, orderBy, onRequestSort } = props;
   const createSortHandler = (property) => (event) => {
@@ -105,21 +103,18 @@ function TableProductsHead(props) {
   );
 }
 
-//Propiedades del encabezado
 TableProductsHead.propTypes = {
   onRequestSort: PropTypes.func.isRequired,
   order: PropTypes.oneOf(['asc', 'desc']).isRequired,
   orderBy: PropTypes.string.isRequired,
 };
 
-//Tabla de mantenimiento de productos
+//tabla de mantenimiento de productos
 export default function TableProducts() {
-  //Datos a cargar en la tabla
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
   const [loaded, setLoaded] = useState(false);
 
-  //Llamar al API y obtener la lista de productos
   useEffect(() => {
     ProductService.getProducts()
       .then((response) => {
@@ -135,31 +130,27 @@ export default function TableProducts() {
       });
   }, []);
 
-  const [order, setOrder] = useState('asc'); //Orden: 'asc' o 'desc'
-  const [orderBy, setOrderBy] = useState('name'); //Campo por el que se ordena
-  const [page, setPage] = useState(0); //Página actual
-  const [dense, setDense] = useState(false); //Densidad de la tabla
-  const [rowsPerPage, setRowsPerPage] = useState(5); //Filas por página
+  const [order, setOrder] = useState('asc');
+  const [orderBy, setOrderBy] = useState('name');
+  const [page, setPage] = useState(0);
+  const [dense, setDense] = useState(false);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  //Cambiar el ordenamiento al dar clic en un encabezado
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
   };
 
-  //Cambiar de página
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
 
-  //Cambiar cantidad de filas por página
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
 
-  //Cambiar densidad
   const handleChangeDense = (event) => {
     setDense(event.target.checked);
   };
@@ -176,7 +167,6 @@ export default function TableProducts() {
               <Typography sx={{ flex: '1 1 100%' }} variant="h6" component="div">
                 Mantenimiento de Productos
               </Typography>
-              {/* Botón para ir al formulario de crear */}
               <Button component={Link} to="/product/create" variant="contained" startIcon={<AddIcon />} sx={{ flexShrink: 0 }}>
                 Nuevo producto
               </Button>
@@ -219,7 +209,6 @@ export default function TableProducts() {
                 </TableBody>
               </Table>
             </TableContainer>
-            {/* Paginación */}
             <TablePagination
               rowsPerPageOptions={[5, 10, 25]}
               component="div"

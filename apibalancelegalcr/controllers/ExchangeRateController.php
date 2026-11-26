@@ -2,7 +2,7 @@
 //localhost/appbalancelegalcr/apibalancelegalcr/exchangerate
 class exchangerate
 {
-    //GET Tipo de cambio del dólar (consumo del web service de Hacienda)
+    //GET tipo de cambio del dólar (web service de Hacienda)
     public function index()
     {
         try {

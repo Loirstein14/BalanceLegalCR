@@ -12,15 +12,14 @@ import EventIcon from '@mui/icons-material/Event';
 import ScheduleIcon from '@mui/icons-material/Schedule';
 import ScheduleService from '../../services/ScheduleService';
 
-//Detalle de un horario
+//detalle de un horario
 export function DetailSchedule() {
-  const routeParams = useParams(); //Id del horario que viene en la ruta
+  const routeParams = useParams();
   const navigate = useNavigate();
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
   const [loaded, setLoaded] = useState(false);
 
-  //Llamar al API para traer el horario
   useEffect(() => {
     ScheduleService.getScheduleById(routeParams.id)
       .then((response) => {

@@ -25,24 +25,24 @@ import { SelectClient } from './Form/SelectClient';
 import { SelectBranchService } from './Form/SelectBranchService';
 import { SelectAvailableHour } from './Form/SelectAvailableHour';
 
-//Registrar reserva: la hace el encargado fijo, en su sucursal, escogiendo al cliente
+//registrar reserva: la hace el encargado fijo en su sucursal y escoge al cliente
 export function CreateAppointment() {
   const navigate = useNavigate();
-  //Fecha de hoy con date-fns: aaaa-mm-dd para comparar con el input de fecha y dd/mm/aaaa para mostrarla
+  //fecha de hoy: aaaa-mm-dd para comparar con el input y dd/mm/aaaa para mostrarla
   const today = format(new Date(), 'yyyy-MM-dd');
   const todayText = format(new Date(), 'dd/MM/yyyy');
 
-  // Esquema de validación
+  //validaciones
   const appointmentSchema = yup.object({
     client_id: yup.number().typeError('Seleccione un cliente').required('El cliente es requerido'),
     service_id: yup.number().typeError('Seleccione un servicio').required('El servicio es requerido'),
     date: yup
       .string()
       .required('La fecha es requerida')
-      //Validador propio (.test): la fecha no puede ser anterior a hoy
+      //la fecha no puede ser antes de hoy
       .test('fecha-no-pasada', 'La fecha no puede ser anterior a hoy', (value) => !value || value >= today),
     start_time: yup.string().required('Seleccione la hora'),
-    //Respuestas: una por pregunta. Las reglas dependen del tipo de pregunta (answer_type)
+    //una respuesta por pregunta, las reglas dependen del answer_type
     answers: yup.array().of(
       yup.object({
         answer_text: yup
@@ -78,25 +78,21 @@ export function CreateAppointment() {
       start_time: '',
       answers: [],
     },
-    // Asignación de validaciones
     resolver: yupResolver(appointmentSchema),
   });
 
-  //Gestión de errores
   const [error, setError] = useState('');
-  // Si ocurre error al realizar el submit
   const onError = (errors, e) => console.log(errors, e);
 
-  //Encargado fijo y su sucursal (los define el API)
+  //encargado y su sucursal, los manda el API
   const [manager, setManager] = useState(null);
-  //Servicios de la sucursal del encargado
   const [dataServices, setDataServices] = useState([]);
   useEffect(() => {
     AppointmentService.getManager()
       .then((response) => {
         console.log(response);
         setManager(response.data);
-        //Con la sucursal del encargado se cargan los servicios que ofrece
+        //con la sucursal se cargan los servicios que da
         return ServiceService.getServicesByBranch(response.data.branch_id);
       })
       .then((response) => {
@@ -108,7 +104,7 @@ export function CreateAppointment() {
       });
   }, []);
 
-  //Estado inicial de la reserva con su color (no se puede cambiar)
+  //estado inicial con su color, no se puede cambiar
   const [status, setStatus] = useState(null);
   useEffect(() => {
     AppointmentService.getInitialStatus()
@@ -119,7 +115,6 @@ export function CreateAppointment() {
       });
   }, []);
 
-  //Lista de clientes
   const [dataClients, setDataClients] = useState([]);
   const [loadedClients, setLoadedClients] = useState(false);
   useEffect(() => {
@@ -134,13 +129,13 @@ export function CreateAppointment() {
       });
   }, []);
 
-  //Preguntas del negocio: se pintan según su tipo y cada una tiene su respuesta en el formulario
+  //preguntas: se pintan según su tipo y cada una tiene su respuesta en el form
   const [questions, setQuestions] = useState([]);
   useEffect(() => {
     QuestionService.getQuestions()
       .then((response) => {
         setQuestions(response.data);
-        //Una respuesta vacía por pregunta; answer_type e is_required se usan en las validaciones de yup
+        //una respuesta vacía por pregunta, answer_type e is_required los usa yup
         setValue(
           'answers',
           response.data.map((question) => ({
@@ -157,20 +152,20 @@ export function CreateAppointment() {
       });
   }, [setValue]);
 
-  //Horas disponibles: se vuelven a pedir al API cada vez que cambia la fecha o el servicio
+  //horas libres: se vuelven a pedir cada vez que cambia la fecha o el servicio
   const date = watch('date');
   const serviceId = watch('service_id');
-  //Solo se consulta cuando ya hay servicio y una fecha válida
+  //solo se consulta si ya hay servicio y una fecha válida
   const readyHours = Boolean(serviceId) && Boolean(date) && date >= today;
   const [hours, setHours] = useState([]);
   const [hoursMessage, setHoursMessage] = useState('');
-  //Se suma 1 cuando el API rechaza la hora (otra persona la tomó) para recargar la lista
+  //se le suma 1 cuando el API rechaza la hora (alguien más la agarró) para recargar
   const [reloadHours, setReloadHours] = useState(0);
   useEffect(() => {
-    //La hora escogida ya no sirve si cambió la fecha o el servicio
+    //si cambió la fecha o el servicio la hora escogida ya no sirve
     setValue('start_time', '');
     if (!readyHours) return;
-    //active evita que una respuesta vieja (de una fecha anterior) pise la lista nueva
+    //active es para que una respuesta vieja no pise la lista nueva
     let active = true;
     AppointmentService.getAvailableHours(date, serviceId)
       .then((response) => {
@@ -180,7 +175,7 @@ export function CreateAppointment() {
         }
       })
       .catch((error) => {
-        //Si no hay horas, el API responde 400 con el mensaje
+        //si no hay horas el API responde 400 con el mensaje
         if (active) {
           setHours([]);
           setHoursMessage(
@@ -193,11 +188,10 @@ export function CreateAppointment() {
     };
   }, [date, serviceId, readyHours, reloadHours, setValue]);
 
-  // Accion submit
   const onSubmit = (DataForm) => {
     console.log('Formulario:');
     console.log(DataForm);
-    //Lo que espera el API: answers solo con question_id y answer_text
+    //el API solo ocupa question_id y answer_text de cada respuesta
     const appointment = {
       client_id: DataForm.client_id,
       service_id: DataForm.service_id,
@@ -209,10 +203,8 @@ export function CreateAppointment() {
       })),
     };
     try {
-      //Crear reserva
       AppointmentService.createAppointment(appointment)
         .then((response) => {
-          //Respuesta al usuario
           if (response.data != null) {
             toast.success(
               `Reserva #${response.data.id} registrada para ${response.data.client} el ${response.data.appointment_date} de ${response.data.time_range}. Se generó la proforma #${response.data.invoice_id}`,
@@ -221,20 +213,19 @@ export function CreateAppointment() {
                 position: 'top-center',
               },
             );
-            //Redirección al historial de reservas
             return navigate('/appointment');
           }
         })
         .catch((error) => {
           console.log(error);
-          //El API manda el mensaje de la regla que no se cumplió (por ejemplo, la hora ya se ocupó)
+          //el API manda el mensaje de la regla que falló (ej la hora ya se ocupó)
           toast.error(
             typeof error.response?.data === 'string' && error.response.data
               ? error.response.data
               : 'No se pudo registrar la reserva',
             { duration: 6000 },
           );
-          //Recargar las horas por si la que se escogió ya no está libre
+          //se recargan las horas por si la que escogió ya no está libre
           setReloadHours((value) => value + 1);
         });
     } catch (error) {
@@ -242,7 +233,7 @@ export function CreateAppointment() {
     }
   };
 
-  //Campo de la respuesta según el tipo de pregunta: texto, Sí/No o número
+  //campo de la respuesta según el tipo: texto, sí/no o número
   const answerInput = (question, index, field) => {
     const answerError = errors.answers?.[index]?.answer_text;
     if (question.answer_type === 'yes_no') {
@@ -281,7 +272,7 @@ export function CreateAppointment() {
             <Typography variant="h5" gutterBottom sx={{ flexGrow: 1 }}>
               Registrar Reserva
             </Typography>
-            {/* Estado inicial con su color: no se puede cambiar */}
+            {/* estado inicial con su color, no se puede cambiar */}
             {status && (
               <Chip
                 label={`Estado: ${status.name}`}
@@ -289,7 +280,7 @@ export function CreateAppointment() {
               />
             )}
           </Grid>
-          {/* Datos que no se pueden modificar */}
+          {/* esto no se puede editar */}
           <Grid size={{ xs: 12, sm: 4 }}>
             <FormControl variant="standard" fullWidth sx={{ m: 1 }}>
               <TextField
@@ -320,7 +311,6 @@ export function CreateAppointment() {
               />
             </FormControl>
           </Grid>
-          {/* Cliente */}
           <Grid size={{ xs: 12, sm: 6 }}>
             <FormControl variant="standard" fullWidth sx={{ m: 1 }}>
               {loadedClients && (
@@ -335,7 +325,6 @@ export function CreateAppointment() {
               </FormHelperText>
             </FormControl>
           </Grid>
-          {/* Servicio */}
           <Grid size={{ xs: 12, sm: 6 }}>
             <FormControl variant="standard" fullWidth sx={{ m: 1 }}>
               <Controller
@@ -348,7 +337,6 @@ export function CreateAppointment() {
               </FormHelperText>
             </FormControl>
           </Grid>
-          {/* Fecha */}
           <Grid size={{ xs: 12, sm: 6 }}>
             <FormControl variant="standard" fullWidth sx={{ m: 1 }}>
               <Controller
@@ -368,7 +356,7 @@ export function CreateAppointment() {
               />
             </FormControl>
           </Grid>
-          {/* Hora: solo las disponibles para ese servicio y esa fecha */}
+          {/* solo las horas libres para ese servicio y esa fecha */}
           <Grid size={{ xs: 12, sm: 6 }}>
             <FormControl variant="standard" fullWidth sx={{ m: 1 }}>
               <Controller
@@ -391,7 +379,6 @@ export function CreateAppointment() {
               </FormHelperText>
             </FormControl>
           </Grid>
-          {/* Preguntas del negocio */}
           <Grid size={12}>
             <Divider sx={{ my: 1 }} />
             <Typography variant="h6" sx={{ m: 1 }}>

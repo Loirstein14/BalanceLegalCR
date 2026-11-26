@@ -14,12 +14,12 @@ import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
 ListCardProducts.propTypes = {
-  data: PropTypes.array, //Lista de productos que viene del API
+  data: PropTypes.array,
 };
 
-//Productos en formato tarjeta (máximo 4 campos: imagen, nombre, categoría y precio)
+//productos en tarjetas: imagen, nombre, categoría y precio
 export function ListCardProducts({ data }) {
-  //Url para acceder a las imágenes guardadas en el API
+  //url de las imágenes que están en el API
   const BASE_URL = import.meta.env.VITE_BASE_URL + 'uploads';
 
   return (
@@ -28,7 +28,6 @@ export function ListCardProducts({ data }) {
         data.map((item) => (
           <Grid size={{ xs: 12, sm: 6, md: 4 }} key={item.id}>
             <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-              {/* Encabezado: nombre y categoría */}
               <CardHeader
                 sx={{
                   backgroundColor: (theme) => theme.palette.secondary.main,
@@ -38,20 +37,17 @@ export function ListCardProducts({ data }) {
                 subheader={item.category}
                 slotProps={{ subheader: { sx: { color: 'grey.300' } } }}
               />
-              {/* Imagen del producto */}
               <CardMedia
                 component="img"
                 height="200"
-                image={item.image_path ? `${BASE_URL}/${item.image_path}` : logo} //Si no tiene imagen se pone el logo
+                image={item.image_path ? `${BASE_URL}/${item.image_path}` : logo} //si no tiene imagen va el logo
                 alt={item.name}
               />
-              {/* Precio */}
               <CardContent sx={{ flexGrow: 1 }}>
                 <Typography variant="h6" align="right">
                   ₡{Number(item.price).toLocaleString('es-CR')}
                 </Typography>
               </CardContent>
-              {/* Enlace al detalle */}
               <CardActions disableSpacing>
                 <Tooltip title="Ver detalle">
                   <IconButton

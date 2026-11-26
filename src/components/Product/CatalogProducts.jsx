@@ -4,16 +4,12 @@ import Typography from '@mui/material/Typography';
 import ProductService from '../../services/ProductService';
 import { ListCardProducts } from './ListCardProducts';
 
-//Catálogo de productos para todos los usuarios
+//catálogo de productos para todos los usuarios
 export function CatalogProducts() {
-  //Resultado de consumo del API, respuesta
   const [data, setData] = useState(null);
-  //Error del API
   const [error, setError] = useState('');
-  //Booleano para establecer sí se ha recibido respuesta
   const [loaded, setLoaded] = useState(false);
 
-  //Llamar al API y obtener la lista de productos
   useEffect(() => {
     ProductService.getProducts()
       .then((response) => {

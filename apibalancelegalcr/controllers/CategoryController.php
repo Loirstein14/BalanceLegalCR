@@ -2,7 +2,7 @@
 //localhost/appbalancelegalcr/apibalancelegalcr/category
 class category
 {
-    //GET listar categorías de productos
+    //GET categorías de productos
     public function index()
     {
         try {

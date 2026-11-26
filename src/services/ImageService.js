@@ -1,5 +1,5 @@
 import axios from 'axios';
-//Ruta del API para subir imágenes (igual que en el ejemplo del profe)
+//ruta del API para subir imágenes, igual que en el ejemplo del profe
 const BASE_URL = import.meta.env.VITE_BASE_URL + 'image';
 
 class ImageService {

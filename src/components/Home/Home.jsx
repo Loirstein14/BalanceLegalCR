@@ -13,7 +13,7 @@ import { Link } from 'react-router-dom';
 import fotoLocal from '../../assets/balance-legal-local.jpg';
 import logoBlanco from '../../assets/logo-balance-legal-blanco.png';
 
-//Accesos rápidos a las secciones de la aplicación
+//accesos rápidos a las secciones
 const sections = [
   { title: 'Productos', text: 'Certificaciones, copias certificadas y libros legales.', link: '/product', icon: <InventoryIcon fontSize="large" /> },
   { title: 'Facturas', text: 'Historial de facturas con su detalle y totales.', link: '/invoice', icon: <ReceiptLongIcon fontSize="large" /> },
@@ -22,22 +22,22 @@ const sections = [
 
 export function Home() {
   return (
-    // Fondo: foto original del local (sin filtro de color), apenas desenfocada y oscurecida
-    // en el centro para que el letrero de la foto no compita con el texto de la página
+    //fondo: la foto del local un poco desenfocada y oscura en el centro
+    //para que el letrero de la foto no le gane al texto
     <Box
       sx={{
         position: 'relative',
         overflow: 'hidden',
-        mx: 'calc(50% - 50vw)', //Ocupa todo el ancho de la pantalla, fuera del Container del Layout
-        mt: -2, //Pega el fondo al encabezado (el Layout tiene 1rem de espacio arriba)
-        mb: -9, //Llega hasta el footer (el Layout deja 4.5rem abajo para el footer fijo)
+        mx: 'calc(50% - 50vw)', //que ocupe todo el ancho, fuera del Container del Layout
+        mt: -2, //pegado al encabezado (el Layout deja 1rem arriba)
+        mb: -9, //que llegue al footer (el Layout deja 4.5rem abajo por el footer fijo)
         minHeight: 'calc(100vh - 64px)',
         display: 'flex',
         alignItems: 'center',
         pb: 9,
       }}
     >
-      {/* Capa 1: foto del local, levemente desenfocada */}
+      {/* capa 1: la foto del local medio desenfocada */}
       <Box
         sx={{
           position: 'absolute',
@@ -46,10 +46,10 @@ export function Home() {
           backgroundSize: 'cover',
           backgroundPosition: 'center 40%',
           filter: 'blur(2px)',
-          transform: 'scale(1.04)', //Evita bordes claros por el desenfoque
+          transform: 'scale(1.04)', //para que no salgan bordes claros por el desenfoque
         }}
       />
-      {/* Capa 2: sombra neutra, más oscura en el centro (donde está el texto) y más clara en los bordes */}
+      {/* capa 2: sombra, más oscura en el centro donde va el texto */}
       <Box
         sx={{
           position: 'absolute',

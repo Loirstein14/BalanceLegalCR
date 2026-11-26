@@ -7,7 +7,7 @@ SelectCategory.propTypes = {
   data: PropTypes.array,
   field: PropTypes.object,
 };
-//Lista de categorías (vienen de la BD)
+//categorías, vienen de la BD
 export function SelectCategory({ field, data }) {
   return (
     <>

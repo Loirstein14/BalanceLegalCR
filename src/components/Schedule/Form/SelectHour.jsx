@@ -8,12 +8,12 @@ SelectHour.propTypes = {
   id: PropTypes.string,
   label: PropTypes.string,
 };
-//Horas completas de 06:00 a 22:00 (como dijo el profe: nada de medias horas)
+//horas completas de 06:00 a 22:00, como dijo el profe nada de medias horas
 const hours = [];
 for (let h = 6; h <= 22; h++) {
   hours.push(String(h).padStart(2, '0') + ':00');
 }
-//Lista de horas (se usa para la hora inicial y la final)
+//horas, se usa para la hora inicial y la final
 export function SelectHour({ field, id, label }) {
   return (
     <>

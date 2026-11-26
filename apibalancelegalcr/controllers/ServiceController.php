@@ -7,11 +7,8 @@ class service
     {
         try {
             $response = new Response();
-            //Instancia del modelo
             $serviceM = new ServiceModel();
-            //Acción del modelo a ejecutar
             $result = $serviceM->all();
-            //Dar respuesta
             $response->toJSON($result);
         } catch (Exception $e) {
             handleException($e);
@@ -30,7 +27,7 @@ class service
             handleException($e);
         }
     }
-    //GET Servicios que ofrece una sucursal
+    //GET servicios que ofrece una sucursal
     //localhost/appbalancelegalcr/apibalancelegalcr/service/getByBranch/1
     public function getByBranch($idBranch)
     {
@@ -49,18 +46,14 @@ class service
         try {
             $request = new Request();
             $response = new Response();
-            //Obtener json enviado
             $inputJSON = $request->getJSON();
-            //Instancia del modelo
             $serviceM = new ServiceModel();
-            //El nombre no se puede repetir (en la BD es UNIQUE)
+            //el nombre no se puede repetir (en la BD es UNIQUE)
             if ($serviceM->nameExists($inputJSON->name)) {
                 $response->toJSON(null, "Ya existe un servicio con ese nombre");
                 return;
             }
-            //Acción del modelo a ejecutar
             $result = $serviceM->create($inputJSON);
-            //Dar respuesta
             $response->toJSON($result);
         } catch (Exception $e) {
             handleException($e);
@@ -72,18 +65,14 @@ class service
         try {
             $request = new Request();
             $response = new Response();
-            //Obtener json enviado
             $inputJSON = $request->getJSON();
-            //Instancia del modelo
             $serviceM = new ServiceModel();
-            //El nombre no se puede repetir con el de otro servicio
+            //el nombre no se puede repetir con otro servicio
             if ($serviceM->nameExists($inputJSON->name, $inputJSON->id)) {
                 $response->toJSON(null, "Ya existe un servicio con ese nombre");
                 return;
             }
-            //Acción del modelo a ejecutar
             $result = $serviceM->update($inputJSON);
-            //Dar respuesta
             $response->toJSON($result);
         } catch (Exception $e) {
             handleException($e);

@@ -20,28 +20,28 @@ import { SelectWeekdays } from '../Schedule/Form/SelectWeekdays';
 
 export function CreateBlock() {
   const navigate = useNavigate();
-  //Fecha de hoy en formato aaaa-mm-dd (el mismo formato del input de fecha)
+  //hoy en aaaa-mm-dd, el mismo formato del input de fecha
   const today = new Date().toLocaleDateString('en-CA');
-  // Esquema de validación
+  //validaciones
   const blockSchema = yup.object({
     branch_id: yup
       .number()
       .typeError('Seleccione una sucursal')
       .required('La sucursal es requerida'),
-    //Rango de fechas: se crea un bloqueo por cada día del rango que caiga en los días marcados
+    //se crea un bloqueo por cada día del rango que caiga en los días marcados
     start_date: yup
       .string()
       .required('La fecha inicial es requerida')
-      //Validador propio (.test): la fecha no puede ser anterior a hoy
+      //la fecha no puede ser antes de hoy
       .test('fecha-no-pasada', 'La fecha inicial no puede ser anterior a hoy', (value) => !value || value >= today),
     end_date: yup
       .string()
       .required('La fecha final es requerida')
-      //this.parent son los demás campos: se compara con la fecha inicial
+      //this.parent son los otros campos, aquí se compara con la fecha inicial
       .test('fecha-final', 'La fecha final debe ser igual o posterior a la inicial', function (value) {
         return !value || !this.parent.start_date || value >= this.parent.start_date;
       })
-      //Máximo 3 meses por rango (igual que en el API)
+      //máximo 3 meses, igual que en el API
       .test('maximo-3-meses', 'El rango puede ser de máximo 3 meses', function (value) {
         return (
           !value ||
@@ -54,7 +54,7 @@ export function CreateBlock() {
     end_time: yup
       .string()
       .required('La hora final es requerida')
-      //this.parent son los demás campos del formulario: se compara con la hora inicial
+      //this.parent son los otros campos, aquí se compara con la hora inicial
       .test('hora-final', 'La hora final debe ser mayor a la hora inicial', function (value) {
         return !value || !this.parent.start_time || value > this.parent.start_time;
       }),
@@ -70,48 +70,42 @@ export function CreateBlock() {
       branch_id: '',
       start_date: '',
       end_date: '',
-      //Por defecto de lunes a viernes
+      //por defecto de lunes a viernes
       weekdays: [1, 2, 3, 4, 5],
       start_time: '',
       end_time: '',
       reason: '',
     },
-    // Asignación de validaciones
     resolver: yupResolver(blockSchema),
   });
 
-  //Gestión de errores
   const [error, setError] = useState('');
-  // Si ocurre error al realizar el submit
   const onError = (errors, e) => console.log(errors, e);
 
-  //Vista previa en tiempo real: fechas que se van a crear (mismo cálculo que hace el API)
+  //vista previa en tiempo real de las fechas que se van a crear (el mismo cálculo del API)
   const [startDate, endDate, weekdays] = watch(['start_date', 'end_date', 'weekdays']);
   const rangeOk =
     Boolean(startDate) &&
     Boolean(endDate) &&
     endDate >= startDate &&
     differenceInCalendarDays(parseISO(endDate), parseISO(startDate)) <= 92;
-  //eachDayOfInterval: todos los días del rango; getISODay: 1 (lunes) a 7 (domingo)
+  //eachDayOfInterval da todos los días del rango y getISODay 1 (lunes) a 7 (domingo)
   const dates = rangeOk
     ? eachDayOfInterval({ start: parseISO(startDate), end: parseISO(endDate) }).filter((day) =>
         weekdays.includes(getISODay(day)),
       )
     : [];
-  //Fecha corta en español para la vista previa: 'lun 07/12'
+  //fecha corta para la vista previa: 'lun 07/12'
   const shortDate = (day) => format(day, 'EEE dd/MM', { locale: es });
 
-  // Accion submit
   const onSubmit = (DataForm) => {
     console.log('Formulario:');
     console.log(DataForm);
     try {
-      //Crear bloqueo
       BlockService.createBlock(DataForm)
         .then((response) => {
-          //Respuesta al usuario
           if (response.data != null) {
-            //El API devuelve la lista de bloqueos creados (uno por fecha)
+            //el API devuelve la lista de bloqueos creados, uno por fecha
             const first = response.data[0];
             const last = response.data[response.data.length - 1];
             toast.success(
@@ -123,13 +117,12 @@ export function CreateBlock() {
                 position: 'top-center',
               },
             );
-            //Redirección a la tabla de bloqueos
             return navigate('/block-table');
           }
         })
         .catch((error) => {
           console.log(error);
-          //El API manda el mensaje de la regla que no se cumplió (por ejemplo, un traslape)
+          //el API manda el mensaje de la regla que falló (ej un traslape)
           toast.error(
             typeof error.response?.data === 'string' && error.response.data
               ? error.response.data
@@ -142,7 +135,6 @@ export function CreateBlock() {
     }
   };
 
-  //Lista de sucursales
   const [dataBranches, setDataBranches] = useState({});
   const [loadedBranches, setLoadedBranches] = useState(false);
   useEffect(() => {
@@ -171,7 +163,6 @@ export function CreateBlock() {
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
             <FormControl variant="standard" fullWidth sx={{ m: 1 }}>
-              {/* Lista de sucursales */}
               {loadedBranches && (
                 <Controller
                   name="branch_id"
@@ -232,7 +223,7 @@ export function CreateBlock() {
               <FormHelperText sx={{ color: '#d32f2f' }}>
                 {errors.weekdays ? errors.weekdays.message : ' '}
               </FormHelperText>
-              {/* Vista previa: cuántos bloqueos se van a crear y en qué fechas */}
+              {/* cuántos bloqueos se van a crear y en qué fechas */}
               {rangeOk && (
                 <Typography variant="body2" color={dates.length > 0 ? 'text.secondary' : '#d32f2f'}>
                   {dates.length === 0

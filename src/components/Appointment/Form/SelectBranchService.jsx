@@ -7,7 +7,7 @@ SelectBranchService.propTypes = {
   data: PropTypes.array,
   field: PropTypes.object,
 };
-//Servicios que ofrece la sucursal: muestra la duración y el precio
+//servicios de la sucursal, con la duración y el precio
 export function SelectBranchService({ field, data }) {
   //60 -> '1 hora', 120 -> '2 horas'
   const duration = (minutes) => {

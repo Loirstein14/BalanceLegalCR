@@ -7,11 +7,8 @@ class product
     {
         try {
             $response = new Response();
-            //Instancia del modelo
             $productM = new ProductModel();
-            //Acción del modelo a ejecutar
             $result = $productM->all();
-            //Dar respuesta
             $response->toJSON($result);
         } catch (Exception $e) {
             handleException($e);
@@ -36,18 +33,14 @@ class product
         try {
             $request = new Request();
             $response = new Response();
-            //Obtener json enviado
             $inputJSON = $request->getJSON();
-            //Instancia del modelo
             $productM = new ProductModel();
-            //El nombre no se puede repetir (en la BD es UNIQUE)
+            //el nombre no se puede repetir (en la BD es UNIQUE)
             if ($productM->nameExists($inputJSON->name)) {
                 $response->toJSON(null, "Ya existe un producto con ese nombre");
                 return;
             }
-            //Acción del modelo a ejecutar
             $result = $productM->create($inputJSON);
-            //Dar respuesta
             $response->toJSON($result);
         } catch (Exception $e) {
             handleException($e);
@@ -59,18 +52,14 @@ class product
         try {
             $request = new Request();
             $response = new Response();
-            //Obtener json enviado
             $inputJSON = $request->getJSON();
-            //Instancia del modelo
             $productM = new ProductModel();
-            //El nombre no se puede repetir con el de otro producto
+            //el nombre no se puede repetir con otro producto
             if ($productM->nameExists($inputJSON->name, $inputJSON->id)) {
                 $response->toJSON(null, "Ya existe un producto con ese nombre");
                 return;
             }
-            //Acción del modelo a ejecutar
             $result = $productM->update($inputJSON);
-            //Dar respuesta
             $response->toJSON($result);
         } catch (Exception $e) {
             handleException($e);
