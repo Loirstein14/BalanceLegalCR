@@ -48,7 +48,7 @@ class invoice
             handleException($e);
         }
     }
-    //POST crear factura ya facturada
+    //POST crear proforma o factura
     public function create()
     {
         try {
@@ -73,7 +73,7 @@ class invoice
             handleException($e);
         }
     }
-    //PUT facturar una proforma
+    //PUT guardar o facturar una proforma
     public function update()
     {
         try {
@@ -99,7 +99,34 @@ class invoice
                 $response->toJSON(null, $mensaje);
                 return;
             }
-            $result = $invoiceM->issueProforma($proforma->id, $inputJSON, $manager);
+            //is_proforma guarda los cambios y si no viene se factura
+            if (!empty($inputJSON->is_proforma)) {
+                $result = $invoiceM->updateProforma($proforma->id, $inputJSON);
+            } else {
+                $result = $invoiceM->issueProforma($proforma->id, $inputJSON, $manager);
+            }
+            $response->toJSON($result);
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
+    //PUT anular una factura facturada
+    public function cancel()
+    {
+        try {
+            $request = new Request();
+            $response = new Response();
+            $inputJSON = $request->getJSON();
+            $userM = new UserModel();
+            $manager = $userM->getManager($this->idManager);
+            $invoiceM = new InvoiceModel();
+            //tiene que estar facturada y ser de la sucursal del encargado
+            $invoice = empty($inputJSON->id) ? null : $invoiceM->get($inputJSON->id);
+            if (empty($invoice) || $invoice->status_id != 2 || $invoice->branch_id != $manager->branch_id) {
+                $response->toJSON(null, "Solo se puede anular una factura Facturado de su sucursal");
+                return;
+            }
+            $result = $invoiceM->cancel($invoice->id);
             $response->toJSON($result);
         } catch (Exception $e) {
             handleException($e);

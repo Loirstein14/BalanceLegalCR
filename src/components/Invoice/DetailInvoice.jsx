@@ -14,7 +14,14 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogActions from '@mui/material/DialogActions';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import BlockIcon from '@mui/icons-material/Block';
+import toast from 'react-hot-toast';
 import InvoiceService from '../../services/InvoiceService';
 import { DollarTotal } from './DollarTotal';
 
@@ -29,6 +36,8 @@ export function DetailInvoice() {
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
   const [loaded, setLoaded] = useState(false);
+  //ventana para confirmar la anulación
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     InvoiceService.getInvoiceById(routeParams.id)
@@ -47,6 +56,28 @@ export function DetailInvoice() {
 
   if (!loaded) return <p>Cargando...</p>;
   if (error) return <p>Error: {error.message}</p>;
+
+  //anular la factura y pintarla con el estado nuevo
+  const cancelInvoice = () => {
+    setOpen(false);
+    InvoiceService.cancelInvoice({ id: data.id })
+      .then((response) => {
+        setData(response.data);
+        toast.success(`La factura ${response.data.number} quedó ${response.data.status}`, {
+          duration: 4000,
+          position: 'top-center',
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+        toast.error(
+          typeof error.response?.data === 'string' && error.response.data
+            ? error.response.data
+            : 'No se pudo anular la factura',
+          { duration: 6000 },
+        );
+      });
+  };
 
   return (
     <Container component="main" maxWidth="md" sx={{ mt: 4, mb: 2 }}>
@@ -138,7 +169,7 @@ export function DetailInvoice() {
           </Box>
         </Paper>
       )}
-      <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
+      <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center', gap: 2 }}>
         <Button
           variant="contained"
           color="primary"
@@ -147,7 +178,27 @@ export function DetailInvoice() {
         >
           Regresar
         </Button>
+        {/* solo las facturas en Facturado se pueden anular */}
+        {data && data.status_id === 2 && (
+          <Button variant="outlined" color="error" startIcon={<BlockIcon />} onClick={() => setOpen(true)}>
+            Anular factura
+          </Button>
+        )}
       </Box>
+      <Dialog open={open} onClose={() => setOpen(false)}>
+        <DialogTitle>Anular factura</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            ¿Desea anular la factura {data?.number}? Esta acción no se puede deshacer.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpen(false)}>No</Button>
+          <Button color="error" variant="contained" onClick={cancelInvoice}>
+            Sí, anular
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 }

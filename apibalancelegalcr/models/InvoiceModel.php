@@ -165,11 +165,21 @@ class InvoiceModel
             handleException($e);
         }
     }
-    //factura nueva ya facturada
+    //factura nueva como proforma o ya facturada
     public function create($objeto, $manager)
     {
         try {
             $calc = $this->calculateLines($objeto->items);
+            if (!empty($objeto->is_proforma)) {
+                //proforma sin número ni fecha de emisión
+                $sql = "INSERT INTO invoices (client_id, branch_id, status_id, subtotal, tax_total, total)
+                        VALUES (?, ?, 1, ?, ?, ?);";
+                $idInvoice = $this->enlace->executeSQL_DML_last($sql, [
+                    $objeto->client_id, $manager->branch_id, $calc->subtotal, $calc->tax_total, $calc->total,
+                ]);
+                $this->createItems($idInvoice, $calc->lines);
+                return $this->get($idInvoice);
+            }
             $sql = "INSERT INTO invoices
                         (invoice_number, client_id, branch_id, status_id, issued_by, issued_at,
                          subtotal, tax_total, total)
@@ -178,6 +188,24 @@ class InvoiceModel
                 $this->nextNumber(), $objeto->client_id, $manager->branch_id, $manager->id,
                 $calc->subtotal, $calc->tax_total, $calc->total,
             ]);
+            $this->createItems($idInvoice, $calc->lines);
+            return $this->get($idInvoice);
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
+    //guardar los cambios de la proforma sin facturar
+    public function updateProforma($idInvoice, $objeto)
+    {
+        try {
+            $calc = $this->calculateLines($objeto->items);
+            $sql = "UPDATE invoices
+                    SET subtotal = ?, tax_total = ?, total = ?
+                    WHERE id = ? AND status_id = 1;";
+            $this->enlace->executeSQL_DML($sql, [$calc->subtotal, $calc->tax_total, $calc->total, $idInvoice]);
+            //se cambian las líneas por las del form
+            $sql = "DELETE FROM invoice_items WHERE invoice_id = ?;";
+            $this->enlace->executeSQL_DML($sql, [$idInvoice]);
             $this->createItems($idInvoice, $calc->lines);
             return $this->get($idInvoice);
         } catch (Exception $e) {
@@ -204,6 +232,27 @@ class InvoiceModel
             $this->enlace->executeSQL_DML($sql, [$idInvoice]);
             $this->createItems($idInvoice, $calc->lines);
             return $this->get($idInvoice);
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
+    //anular la proforma de una reserva
+    public function cancelProforma($idAppointment)
+    {
+        try {
+            $sql = "UPDATE invoices SET status_id = 3 WHERE appointment_id = ? AND status_id = 1;";
+            return $this->enlace->executeSQL_DML($sql, [$idAppointment]);
+        } catch (Exception $e) {
+            handleException($e);
+        }
+    }
+    //anular una factura ya facturada
+    public function cancel($id)
+    {
+        try {
+            $sql = "UPDATE invoices SET status_id = 3 WHERE id = ? AND status_id = 2;";
+            $this->enlace->executeSQL_DML($sql, [$id]);
+            return $this->get($id);
         } catch (Exception $e) {
             handleException($e);
         }

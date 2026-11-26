@@ -65,6 +65,7 @@ function stableSort(array, comparator) {
 const statusColor = (statusId) => {
   if (statusId === 1) return 'warning';
   if (statusId === 2) return 'success';
+  if (statusId === 3) return 'error';
   return 'default';
 };
 
@@ -283,9 +284,9 @@ export default function TableInvoices() {
                               <VisibilityIcon />
                             </IconButton>
                           </Tooltip>
-                          {/* solo las proformas se pueden facturar */}
+                          {/* solo las proformas se pueden editar o facturar */}
                           {row.status_id === 1 && (
-                            <Tooltip title="Facturar proforma">
+                            <Tooltip title="Editar o facturar proforma">
                               <IconButton component={Link} to={`/invoice/issue/${row.id}`} color="success">
                                 <PointOfSaleIcon />
                               </IconButton>

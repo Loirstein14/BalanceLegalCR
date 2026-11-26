@@ -19,11 +19,19 @@ class InvoiceService {
   createInvoice(Invoice) {
     return axios.post(BASE_URL, JSON.stringify(Invoice));
   }
-  //facturar una proforma
+  //guardar o facturar una proforma
   issueProforma(Invoice) {
     return axios({
       method: 'put',
       url: BASE_URL,
+      data: JSON.stringify(Invoice),
+    });
+  }
+  //anular una factura facturada
+  cancelInvoice(Invoice) {
+    return axios({
+      method: 'put',
+      url: BASE_URL + '/cancel',
       data: JSON.stringify(Invoice),
     });
   }

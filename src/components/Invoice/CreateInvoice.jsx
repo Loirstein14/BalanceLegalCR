@@ -212,7 +212,8 @@ export function CreateInvoice() {
   //productos y servicios que ya están en alguna línea
   const used = items.map((line) => line.item);
 
-  const onSubmit = (DataForm) => {
+  //asProforma dice si se guarda como proforma o se factura
+  const onSubmit = (DataForm, asProforma) => {
     console.log('Formulario:');
     console.log(DataForm);
     //los precios los pone el API
@@ -229,16 +230,21 @@ export function CreateInvoice() {
     };
     //si es proforma se actualiza y si no se crea
     const request = isProforma
-      ? InvoiceService.issueProforma({ id: Number(id), items: invoice.items })
-      : InvoiceService.createInvoice(invoice);
+      ? InvoiceService.issueProforma({ id: Number(id), items: invoice.items, is_proforma: asProforma })
+      : InvoiceService.createInvoice({ ...invoice, is_proforma: asProforma });
     try {
       request
         .then((response) => {
           if (response.data != null) {
+            //mensaje según lo que se hizo
+            let mensaje = `Factura ${response.data.number} registrada a ${response.data.client_name} por ${money(response.data.total)}`;
+            if (asProforma) {
+              mensaje = `${response.data.number} guardada a ${response.data.client_name} por ${money(response.data.total)}`;
+            } else if (isProforma) {
+              mensaje = `Proforma #${id} facturada como ${response.data.number} por ${money(response.data.total)}`;
+            }
             toast.success(
-              isProforma
-                ? `Proforma #${id} facturada como ${response.data.number} por ${money(response.data.total)}`
-                : `Factura ${response.data.number} registrada a ${response.data.client_name} por ${money(response.data.total)}`,
+              mensaje,
               {
                 duration: 5000,
                 position: 'top-center',
@@ -264,16 +270,21 @@ export function CreateInvoice() {
   if (error) return <p>Error: {error.message}</p>;
   return (
     <>
-      <form onSubmit={handleSubmit(onSubmit, onError)} noValidate>
+      {/* con enter se guarda como proforma para no facturar por error */}
+      <form onSubmit={handleSubmit((data) => onSubmit(data, true), onError)} noValidate>
         <Grid container spacing={1}>
           <Grid size={12}>
             <Typography variant="h5" gutterBottom>
-              {isProforma ? `Facturar Proforma #${id}` : 'Registrar Factura'}
+              {isProforma ? `Proforma #${id}` : 'Registrar Factura'}
             </Typography>
             {proforma && proforma.appointment_id && (
               <Typography variant="body2" color="text.secondary">
-                Proforma generada por la reserva #{proforma.appointment_id}. Puede agregar o quitar productos y
-                servicios antes de facturar.
+                Proforma generada por la reserva #{proforma.appointment_id}.
+              </Typography>
+            )}
+            {isProforma && (
+              <Typography variant="body2" color="text.secondary">
+                Puede agregar o quitar productos y servicios y guardar la proforma o facturarla.
               </Typography>
             )}
           </Grid>
@@ -446,8 +457,16 @@ export function CreateInvoice() {
             </Box>
           </Grid>
           <Grid size={12}>
-            <Button type="submit" variant="contained" color="secondary" sx={{ m: 1 }}>
-              {isProforma ? 'Facturar' : 'Guardar'}
+            <Button type="submit" variant="outlined" color="secondary" sx={{ m: 1 }}>
+              Guardar proforma
+            </Button>
+            <Button
+              variant="contained"
+              color="secondary"
+              sx={{ m: 1 }}
+              onClick={handleSubmit((data) => onSubmit(data, false), onError)}
+            >
+              Facturar
             </Button>
             <Button variant="outlined" sx={{ m: 1 }} onClick={() => navigate('/invoice')}>
               Cancelar
