@@ -17,6 +17,7 @@ import logoBlanco from '../../assets/logo-balance-legal-blanco.png';
 //enlaces del menú principal
 const navItems = [
   { name: 'Productos', link: '/product' }, //catálogo en cards
+  { name: 'Servicios', link: '/service' },
   { name: 'Facturas', link: '/invoice' },
   { name: 'Reservas', link: '/appointment' },
 ];
