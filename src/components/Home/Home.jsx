@@ -22,22 +22,21 @@ const sections = [
 
 export function Home() {
   return (
-    //fondo: la foto del local un poco desenfocada y oscura en el centro
-    //para que el letrero de la foto no le gane al texto
+    //fondo con la foto del local desenfocada
     <Box
       sx={{
         position: 'relative',
         overflow: 'hidden',
-        mx: 'calc(50% - 50vw)', //que ocupe todo el ancho, fuera del Container del Layout
-        mt: -2, //pegado al encabezado (el Layout deja 1rem arriba)
-        mb: -9, //que llegue al footer (el Layout deja 4.5rem abajo por el footer fijo)
+        mx: 'calc(50% - 50vw)', //que ocupe todo el ancho
+        mt: -2, //pegado al encabezado
+        mb: -9, //que llegue hasta el footer
         minHeight: 'calc(100vh - 64px)',
         display: 'flex',
         alignItems: 'center',
         pb: 9,
       }}
     >
-      {/* capa 1: la foto del local medio desenfocada */}
+      {/* capa con la foto del local */}
       <Box
         sx={{
           position: 'absolute',
@@ -49,7 +48,7 @@ export function Home() {
           transform: 'scale(1.04)', //para que no salgan bordes claros por el desenfoque
         }}
       />
-      {/* capa 2: sombra, más oscura en el centro donde va el texto */}
+      {/* capa de sombra para que se lea el texto */}
       <Box
         sx={{
           position: 'absolute',

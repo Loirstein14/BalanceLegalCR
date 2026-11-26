@@ -1,6 +1,5 @@
 <?php
-//bloqueos de horas de una sucursal por fecha (tabla schedule_blocks)
-//provider_id queda en NULL porque el bloqueo es para toda la sucursal
+//bloqueos de horas de cada sucursal por fecha
 class BlockModel
 {
     public $enlace;
@@ -8,7 +7,7 @@ class BlockModel
     {
         $this->enlace = new MySqlConnect(); //Conectarse a la BD
     }
-    //las horas sin segundos y la fecha en dd/mm/aaaa para mostrarla
+    //horas sin segundos y fecha en dd/mm/aaaa
     private $campos = "k.id, k.branch_id, b.name AS branch, k.block_date,
                        DATE_FORMAT(k.block_date, '%d/%m/%Y') AS date_text,
                        TIME_FORMAT(k.start_time, '%H:%i') AS start_time,
@@ -56,8 +55,7 @@ class BlockModel
             handleException($e);
         }
     }
-    //busca un bloqueo de la misma sucursal y fecha que choque con el rango
-    //(la misma consulta de ScheduleModel pero en schedule_blocks)
+    //busca un bloqueo que choque ese día
     public function getOverlap($idBranch, $date, $start, $end, $idBlock = 0)
     {
         try {

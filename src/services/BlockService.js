@@ -12,11 +12,10 @@ class BlockService {
     return axios.get(BASE_URL + '/' + BlockId);
   }
   //bloqueos de una sucursal
-  //localhost/appbalancelegalcr/apibalancelegalcr/block/getByBranch/1
   getBlocksByBranch(BranchId) {
     return axios.get(BASE_URL + '/getByBranch/' + BranchId);
   }
-  //crear, llega un rango y el API crea uno por día
+  //crear bloqueos por rango
   createBlock(Block) {
     return axios.post(BASE_URL, JSON.stringify(Block));
   }

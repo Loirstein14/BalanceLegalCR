@@ -1,4 +1,3 @@
-//https://mui.com/material-ui/react-table/#sorting-amp-selecting
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
@@ -57,7 +56,7 @@ function stableSort(array, comparator) {
   return stabilizedThis.map((el) => el[0]);
 }
 
-//encabezados, máximo 4 campos
+//encabezados de la tabla
 const headCells = [
   { id: 'name', numeric: false, label: 'Producto' },
   { id: 'category', numeric: false, label: 'Categoría' },

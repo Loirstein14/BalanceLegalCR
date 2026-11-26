@@ -1,12 +1,10 @@
 <?php
 class invoice
 {
-    //encargado fijo, el mismo de AppointmentController
-    //2 = Adrián Pérez, Oficina Central
+    //encargado fijo el mismo de AppointmentController
     private $idManager = 2;
 
-    //GET historial de facturas de la sucursal del encargado
-    //localhost/appbalancelegalcr/apibalancelegalcr/invoice
+    //GET historial de facturas del encargado
     public function index()
     {
         try {
@@ -21,8 +19,7 @@ class invoice
             handleException($e);
         }
     }
-    //GET factura por id con el detalle y los totales
-    //localhost/appbalancelegalcr/apibalancelegalcr/invoice/1
+    //GET factura por id con sus líneas
     public function get($id)
     {
         try {
@@ -34,8 +31,7 @@ class invoice
             handleException($e);
         }
     }
-    //GET encabezado de la factura: encargado, sucursal y % de impuesto
-    //localhost/appbalancelegalcr/apibalancelegalcr/invoice/header
+    //GET encargado sucursal y porcentaje de impuesto
     public function header()
     {
         try {
@@ -52,8 +48,7 @@ class invoice
             handleException($e);
         }
     }
-    //POST crear factura, queda facturada con su número
-    //localhost/appbalancelegalcr/apibalancelegalcr/invoice
+    //POST crear factura ya facturada
     public function create()
     {
         try {
@@ -63,7 +58,7 @@ class invoice
             //la sucursal y el que emite salen del encargado
             $userM = new UserModel();
             $manager = $userM->getManager($this->idManager);
-            //las líneas en 0 se quitan (lo pide el enunciado)
+            //las líneas en 0 se quitan
             $inputJSON->items = $this->quitarCantidadCero($inputJSON);
             //si alguna regla falla se le devuelve el mensaje
             $mensaje = $this->validar($inputJSON, $manager);
@@ -78,8 +73,7 @@ class invoice
             handleException($e);
         }
     }
-    //PUT facturar una proforma, el id viene en el objeto
-    //localhost/appbalancelegalcr/apibalancelegalcr/invoice
+    //PUT facturar una proforma
     public function update()
     {
         try {
@@ -89,13 +83,13 @@ class invoice
             $userM = new UserModel();
             $manager = $userM->getManager($this->idManager);
             $invoiceM = new InvoiceModel();
-            //tiene que existir, seguir siendo proforma y ser de la sucursal del encargado
+            //tiene que ser proforma y de la sucursal del encargado
             $proforma = empty($inputJSON->id) ? null : $invoiceM->get($inputJSON->id);
             if (empty($proforma) || $proforma->status_id != 1 || $proforma->branch_id != $manager->branch_id) {
                 $response->toJSON(null, "La factura no existe, ya fue facturada o no es de su sucursal");
                 return;
             }
-            //el cliente es el de la proforma (viene de la reserva), no se cambia
+            //el cliente es el de la proforma y no se cambia
             $inputJSON->client_id = $proforma->client_id;
             //las líneas en 0 se quitan
             $inputJSON->items = $this->quitarCantidadCero($inputJSON);
@@ -124,7 +118,7 @@ class invoice
         }
         return $items;
     }
-    //reglas de la factura, devuelve el mensaje del error o null si todo bien
+    //reglas de la factura devuelve el error o null
     private function validar($objeto, $manager)
     {
         $userM = new UserModel();
@@ -136,15 +130,14 @@ class invoice
         if (count($objeto->items) == 0) {
             return "La factura debe tener al menos un producto o servicio";
         }
-        //productos activos y servicios de la sucursal
-        //ojo: si no hay filas executeSQL devuelve null, por eso el ?: []
+        //ojo si no hay filas executeSQL devuelve null
         $products = $productM->all() ?: [];
         $services = $serviceM->getByBranch($manager->branch_id) ?: [];
         $usados = []; //para no repetir el mismo producto o servicio
         foreach ($objeto->items as $item) {
             $esProducto = !empty($item->product_id);
             $esServicio = !empty($item->service_id);
-            //cada línea es un producto o un servicio, no los dos
+            //cada línea es un producto o un servicio
             if ($esProducto == $esServicio) {
                 return "Cada línea debe tener un producto o un servicio";
             }
@@ -165,7 +158,7 @@ class invoice
                     ? "Uno de los productos no existe o no está activo"
                     : "Uno de los servicios no existe o no se ofrece en esta sucursal";
             }
-            //sin repetidos, si ocupa más le sube la cantidad
+            //sin repetidos mejor se sube la cantidad
             $clave = ($esProducto ? 'P' : 'S') . ($esProducto ? $item->product_id : $item->service_id);
             if (in_array($clave, $usados)) {
                 return "Hay un producto o servicio repetido; aumente la cantidad en una sola línea";

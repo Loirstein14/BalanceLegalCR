@@ -7,7 +7,6 @@ class ServiceModel
         $this->enlace = new MySqlConnect(); //Conectarse a la BD
     }
     //servicios para la tabla de mantenimiento
-    //modality_name es la modalidad en español, igual que delivery_format en productos
     public function all()
     {
         try {
@@ -47,8 +46,7 @@ class ServiceModel
             handleException($e);
         }
     }
-    //servicios activos de una sucursal (tabla branch_services)
-    //va la duración y el precio para mostrarlos en la reserva
+    //servicios activos de una sucursal
     public function getByBranch($idBranch)
     {
         try {
@@ -64,7 +62,7 @@ class ServiceModel
             handleException($e);
         }
     }
-    //ver si ya hay otro servicio con ese nombre (al editar no se compara consigo mismo)
+    //ver si ya hay otro servicio con ese nombre
     public function nameExists($name, $idService = 0)
     {
         try {

@@ -66,7 +66,7 @@ export function CreateProduct() {
   const [error, setError] = useState('');
   const onError = (errors, e) => console.log(errors, e);
 
-  //imagen escogida y su vista previa (igual que en MovieUploadImage)
+  //imagen escogida y su vista previa
   const [file, setFile] = useState(null);
   const [fileURL, setFileURL] = useState(null);
   function handleChange(e) {
@@ -75,7 +75,7 @@ export function CreateProduct() {
       setFile(e.target.files[0]);
     }
   }
-  //la imagen se sube después de crear el producto porque ocupa el id
+  //la imagen se sube después porque ocupa el id
   const saveImage = (idProduct) => {
     if (!file) {
       return navigate('/product-table');
@@ -88,7 +88,7 @@ export function CreateProduct() {
       .then(() => navigate('/product-table'))
       .catch((error) => {
         console.log(error);
-        //el producto sí se creó, entonces se manda a editar para volver a intentar con la imagen
+        //si falla la imagen se manda a editar
         toast.error(typeof error.response?.data === 'string' ? error.response.data : 'No se pudo subir la imagen');
         navigate(`/product/update/${idProduct}`);
       });
@@ -110,7 +110,7 @@ export function CreateProduct() {
         })
         .catch((error) => {
           console.log(error);
-          //si el API manda un mensaje (ej nombre repetido) se le enseña al usuario
+          //el API manda el mensaje del error
           toast.error(
             typeof error.response?.data === 'string' && error.response.data
               ? error.response.data
@@ -245,7 +245,7 @@ export function CreateProduct() {
             </FormControl>
           </Grid>
           <Grid size={12}>
-            {/* imagen opcional, se sube con FormData después de guardar */}
+            {/* imagen opcional */}
             <FormControl variant="standard" fullWidth sx={{ m: 1 }}>
               <Typography variant="subtitle1">Imagen (JPG, PNG o GIF, máximo 2 MB)</Typography>
               <input type="file" accept="image/*" onChange={handleChange} />

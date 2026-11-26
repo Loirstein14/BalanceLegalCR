@@ -9,8 +9,7 @@ DollarTotal.propTypes = {
   total: PropTypes.number,
   align: PropTypes.string,
 };
-//total de la factura en dólares con el tipo de cambio de venta del día (Hacienda)
-//si el web service no responde solo se avisa y la factura sigue en colones
+//total en dólares con el tipo de cambio de Hacienda
 export function DollarTotal({ total, align = 'right' }) {
   const [rate, setRate] = useState(null);
   const [error, setError] = useState('');
@@ -37,7 +36,7 @@ export function DollarTotal({ total, align = 'right' }) {
       </Typography>
     );
   }
-  //colones a dólares: total / tipo de cambio de venta
+  //colones entre el tipo de cambio de venta
   const dollars = total / rate.sale;
   return (
     <Box sx={{ textAlign: align }}>

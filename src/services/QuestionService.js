@@ -3,8 +3,7 @@ import axios from 'axios';
 const BASE_URL = import.meta.env.VITE_BASE_URL + 'question';
 
 class QuestionService {
-  //preguntas activas, en orden
-  //localhost/appbalancelegalcr/apibalancelegalcr/question
+  //preguntas de la reserva
   getQuestions() {
     return axios.get(BASE_URL);
   }

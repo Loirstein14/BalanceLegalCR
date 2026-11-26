@@ -25,7 +25,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import GavelIcon from '@mui/icons-material/Gavel';
 import ServiceService from '../../services/ServiceService';
 
-//tabla de servicios: listar, buscar por nombre, ver detalle, crear y editar
+//tabla de servicios con buscador
 export default function TableServices() {
   //url de las imágenes que están en el API
   const IMG_URL = import.meta.env.VITE_BASE_URL + 'uploads';
@@ -52,7 +52,7 @@ export default function TableServices() {
   if (!loaded) return <p>Cargando...</p>;
   if (error) return <p>Error: {error.message}</p>;
 
-  //los que coinciden con lo que se buscó, sin importar mayúsculas
+  //servicios que coinciden con la búsqueda
   const filtered = (data ?? []).filter((s) => s.name.toLowerCase().includes(search.trim().toLowerCase()));
 
   return (

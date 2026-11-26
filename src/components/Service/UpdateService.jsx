@@ -92,7 +92,7 @@ export function UpdateService() {
   const [error, setError] = useState('');
   const onError = (errors, e) => console.log(errors, e);
 
-  //imagen escogida y su vista previa (igual que en MovieUploadImage)
+  //imagen escogida y su vista previa
   const [file, setFile] = useState(null);
   const [fileURL, setFileURL] = useState(null);
   function handleChange(e) {
@@ -114,7 +114,7 @@ export function UpdateService() {
       .then(() => navigate('/service-table'))
       .catch((error) => {
         console.log(error);
-        //los datos sí se guardaron, solo falló la imagen, se queda en el form para volver a intentar
+        //si falla la imagen se queda en el form
         toast.error(typeof error.response?.data === 'string' ? error.response.data : 'No se pudo subir la imagen');
       });
   };
@@ -136,7 +136,7 @@ export function UpdateService() {
         })
         .catch((error) => {
           console.log(error);
-          //si el API manda un mensaje (ej nombre repetido) se le enseña al usuario
+          //el API manda el mensaje del error
           toast.error(
             typeof error.response?.data === 'string' && error.response.data
               ? error.response.data
@@ -255,7 +255,7 @@ export function UpdateService() {
             </FormControl>
           </Grid>
           <Grid size={12}>
-            {/* imagen opcional, si escoge otra se cambia la que tiene */}
+            {/* imagen opcional */}
             <FormControl variant="standard" fullWidth sx={{ m: 1 }}>
               <Typography variant="subtitle1">Imagen (JPG, PNG o GIF, máximo 2 MB)</Typography>
               <input type="file" accept="image/*" onChange={handleChange} />

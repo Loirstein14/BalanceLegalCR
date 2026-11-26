@@ -1,5 +1,5 @@
 import { createTheme } from '@mui/material/styles';
-//colores sacados del local (el azul de la pared) y la lavanda de la balanza del logo
+//colores del local y del logo
 export const appTheme = createTheme({
   palette: {
     mode: 'light',

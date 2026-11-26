@@ -24,7 +24,7 @@ export function UpdateBranch() {
       BranchService.getBranchById(id)
         .then((response) => {
           console.log(response.data);
-          //el select ocupa solo los ids de los encargados (igual que los géneros en UpdateMovie)
+          //el select ocupa solo los ids de los encargados
           setValores({
             id: response.data.id,
             name: response.data.name,
@@ -61,7 +61,7 @@ export function UpdateBranch() {
       .required('El teléfono es requerido')
       .matches(/^\d{4}-\d{4}$/, 'El teléfono debe tener el formato 2222-3333'),
     email: yup.string().required('El correo es requerido').email('El correo no es válido'),
-    //los encargados van en un arreglo de ids (puede ir vacío)
+    //arreglo con los ids de los encargados
     managers: yup.array(),
   });
   const {
@@ -100,7 +100,7 @@ export function UpdateBranch() {
         })
         .catch((error) => {
           console.log(error);
-          //si el API manda un mensaje (ej nombre repetido) se le enseña al usuario
+          //el API manda el mensaje del error
           toast.error(
             typeof error.response?.data === 'string' && error.response.data
               ? error.response.data
@@ -123,7 +123,7 @@ export function UpdateBranch() {
         setLoadedManagers(true);
       })
       .catch((error) => {
-        //si no hay encargados libres el API da error y la lista queda vacía
+        //si no hay encargados libres la lista queda vacía
         console.log(error);
         setDataManagers([]);
         setLoadedManagers(true);

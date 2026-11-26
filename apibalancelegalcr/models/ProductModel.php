@@ -23,7 +23,7 @@ class ProductModel
     public function get($id)
     {
         try {
-            //category_id y delivery_format_code son para precargar el form de editar
+            //estos campos son para precargar el form de editar
             $vSql = "SELECT p.id, p.name, p.description, p.price, p.image_path, p.delivery_days,
                             p.category_id, p.delivery_format AS delivery_format_code,
                             c.name AS category,
@@ -39,7 +39,7 @@ class ProductModel
             handleException($e);
         }
     }
-    //ver si ya hay otro producto con ese nombre (al editar no se compara consigo mismo)
+    //ver si ya hay otro producto con ese nombre
     public function nameExists($name, $idProduct = 0)
     {
         try {

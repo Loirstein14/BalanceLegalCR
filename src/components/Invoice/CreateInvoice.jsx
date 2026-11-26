@@ -33,7 +33,7 @@ import { SelectClient } from '../Appointment/Form/SelectClient';
 import { SelectItem } from './Form/SelectItem';
 import { DollarTotal } from './DollarTotal';
 
-//celdas de la tabla de líneas, mismo estilo del Cart.jsx del profe
+//celdas igual que el Cart del profe
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.primary.main,
@@ -49,15 +49,13 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
 }));
 
-//plata: ₡12 345,00
+//formato de plata en colones
 const money = (value) =>
   '₡' + Number(value).toLocaleString('es-CR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 //redondear a 2 decimales igual que la BD y el API
 const round2 = (value) => Math.round(value * 100) / 100;
 
-//registrar factura: la hace el encargado fijo en su sucursal, con productos y/o servicios
-//este mismo form sirve para facturar una proforma (/invoice/issue/:id),
-//como es idéntico no se hizo otro componente
+//registrar factura y también facturar proforma
 export function CreateInvoice() {
   const navigate = useNavigate();
   //si la ruta trae id es que se está facturando esa proforma
@@ -91,7 +89,7 @@ export function CreateInvoice() {
         return new Set(keys).size === keys.length;
       }),
   });
-  //datos de la proforma para precargar el form (null si es factura nueva)
+  //datos de la proforma para precargar el form
   const [proforma, setProforma] = useState(null);
   const [proformaValues, setProformaValues] = useState(null);
   const {
@@ -105,11 +103,11 @@ export function CreateInvoice() {
       //arranca con una línea vacía
       items: [{ item: '', quantity: 1 }],
     },
-    //se precarga con la proforma, igual que en los update
+    //se precarga con la proforma
     values: proformaValues,
     resolver: yupResolver(invoiceSchema),
   });
-  //líneas de la factura (agregar y quitar), igual que los actores de la película
+  //líneas de la factura igual que los actores
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'items',
@@ -118,10 +116,9 @@ export function CreateInvoice() {
   const [error, setError] = useState('');
   const onError = (errors, e) => console.log(errors, e);
 
-  //encabezado: encargado, sucursal y % de impuesto, los manda el API
+  //encargado sucursal e impuesto
   const [header, setHeader] = useState(null);
-  //catálogo: servicios de la sucursal + productos activos,
-  //cada uno con su clave 'S-id' o 'P-id', nombre y precio
+  //catálogo de servicios y productos
   const [catalog, setCatalog] = useState([]);
   useEffect(() => {
     let services = [];
@@ -146,20 +143,20 @@ export function CreateInvoice() {
       });
   }, []);
 
-  //facturar proforma: se carga y se pasan sus datos al form
+  //cargar la proforma en el form
   useEffect(() => {
     if (!id) return;
     InvoiceService.getInvoiceById(id)
       .then((response) => {
         console.log(response);
-        //solo se puede facturar si todavía es proforma (estado 1)
+        //solo se factura si todavía es proforma
         if (response.data.status_id !== 1) {
           toast.error(`${response.data.number} ya no es una proforma (estado: ${response.data.status})`);
           navigate('/invoice');
           return;
         }
         setProforma(response.data);
-        //cliente y líneas de la proforma, cada línea con su clave y su cantidad
+        //cliente y líneas de la proforma
         setProformaValues({
           client_id: response.data.client_id,
           items: response.data.items.map((line) => ({
@@ -188,10 +185,10 @@ export function CreateInvoice() {
       });
   }, []);
 
-  //cálculos en tiempo real: watch devuelve las líneas cada vez que cambian
+  //watch trae las líneas cada vez que cambian
   const items = watch('items');
   const taxRate = header ? Number(header.tax_rate) : 0;
-  //por línea: precio del catálogo, subtotal = precio x cantidad, impuesto y total
+  //subtotal impuesto y total de una línea
   const lineValues = (line) => {
     const row = catalog.find((item) => item.key === line.item);
     const price = row ? Number(row.price) : 0;
@@ -200,7 +197,7 @@ export function CreateInvoice() {
     const tax = round2((subtotal * taxRate) / 100);
     return { price, subtotal, tax, total: round2(subtotal + tax) };
   };
-  //totales = suma de las líneas con reduce, igual que getTotal del carrito
+  //totales con reduce igual que el carrito
   const totals = items.reduce(
     (acc, line) => {
       const values = lineValues(line);
@@ -218,7 +215,7 @@ export function CreateInvoice() {
   const onSubmit = (DataForm) => {
     console.log('Formulario:');
     console.log(DataForm);
-    //al API solo se le manda product_id o service_id y la cantidad, los precios los pone él
+    //los precios los pone el API
     const invoice = {
       client_id: DataForm.client_id,
       items: DataForm.items.map((line) => {
@@ -230,8 +227,7 @@ export function CreateInvoice() {
         };
       }),
     };
-    //proforma: se manda el id y el cliente lo pone el API (el de la proforma)
-    //factura nueva: se crea
+    //si es proforma se actualiza y si no se crea
     const request = isProforma
       ? InvoiceService.issueProforma({ id: Number(id), items: invoice.items })
       : InvoiceService.createInvoice(invoice);
@@ -281,7 +277,7 @@ export function CreateInvoice() {
               </Typography>
             )}
           </Grid>
-          {/* encabezado, solo el cliente se puede escoger */}
+          {/* encabezado de la factura */}
           <Grid size={{ xs: 12, sm: 4 }}>
             <FormControl variant="standard" fullWidth sx={{ m: 1 }}>
               <TextField id="date" label="Fecha" value={todayText} slotProps={{ input: { readOnly: true } }} />
@@ -309,7 +305,7 @@ export function CreateInvoice() {
           </Grid>
           <Grid size={12}>
             <FormControl variant="standard" fullWidth sx={{ m: 1 }}>
-              {/* en la proforma el cliente no se cambia, es el de la reserva */}
+              {/* en la proforma el cliente no se cambia */}
               {isProforma && (
                 <TextField
                   id="client"
@@ -351,7 +347,7 @@ export function CreateInvoice() {
                     const values = lineValues(items[index] || {});
                     const lineErrors = errors.items?.[index];
                     return (
-                      //field.id lo genera useFieldArray y sirve de key para la fila
+                      //field id sirve de key para la fila
                       <TableRow key={field.id}>
                         <StyledTableCell>
                           <Controller
@@ -380,7 +376,7 @@ export function CreateInvoice() {
                                 error={Boolean(lineErrors?.quantity)}
                                 helperText={lineErrors?.quantity ? lineErrors.quantity.message : ''}
                                 onChange={(e) => {
-                                  //cantidad 0: se quita la línea
+                                  //con cantidad 0 se quita la línea
                                   if (e.target.value !== '' && Number(e.target.value) === 0) {
                                     remove(index);
                                     toast('Se eliminó la línea (cantidad 0)');
@@ -440,11 +436,11 @@ export function CreateInvoice() {
                 </TableFooter>
               </Table>
             </TableContainer>
-            {/* errores de toda la lista (sin líneas o repetidos) */}
+            {/* errores de toda la lista */}
             <FormHelperText sx={{ color: '#d32f2f', ml: 1 }}>
               {errors.items?.message || errors.items?.root?.message || ' '}
             </FormHelperText>
-            {/* total en dólares en tiempo real (web service de Hacienda) */}
+            {/* total en dólares en tiempo real */}
             <Box sx={{ mr: 2 }}>
               <DollarTotal total={totals.total} />
             </Box>

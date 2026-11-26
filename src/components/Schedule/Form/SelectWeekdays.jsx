@@ -7,7 +7,7 @@ import PropTypes from 'prop-types';
 SelectWeekdays.propTypes = {
   field: PropTypes.object,
 };
-//días con la numeración ISO que usa el API: 1 lunes ... 7 domingo
+//días de la semana del 1 al 7
 const days = [
   { value: 1, label: 'Lun' },
   { value: 2, label: 'Mar' },
@@ -17,8 +17,7 @@ const days = [
   { value: 6, label: 'Sáb' },
   { value: 7, label: 'Dom' },
 ];
-//checkboxes de los días, se usa en horarios y bloqueos por rango
-//field.value es un arreglo con los días marcados, ej [1, 2, 3, 4, 5]
+//checkboxes de los días de la semana
 export function SelectWeekdays({ field }) {
   const toggle = (day) => {
     if (field.value.includes(day)) {

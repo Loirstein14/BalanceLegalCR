@@ -13,7 +13,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import GavelIcon from '@mui/icons-material/Gavel';
 import ServiceService from '../../services/ServiceService';
 
-//fila del detalle tipo "etiqueta: valor"
+//fila del detalle
 function InfoRow({ label, children }) {
   return (
     <Typography variant="subtitle1" sx={{ mb: 1 }}>

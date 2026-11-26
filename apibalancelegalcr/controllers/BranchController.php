@@ -14,8 +14,7 @@ class branch
             handleException($e);
         }
     }
-    //GET obtener, con sus encargados
-    //localhost/appbalancelegalcr/apibalancelegalcr/branch/1
+    //GET obtener con sus encargados
     public function get($id)
     {
         try {
@@ -28,8 +27,6 @@ class branch
         }
     }
     //GET encargados que se pueden asignar
-    //localhost/appbalancelegalcr/apibalancelegalcr/branch/managers      (al crear, solo los libres)
-    //localhost/appbalancelegalcr/apibalancelegalcr/branch/managers/1    (al editar la sucursal 1)
     public function managers($idBranch = 0)
     {
         try {
@@ -49,7 +46,7 @@ class branch
             $response = new Response();
             $inputJSON = $request->getJSON();
             $branchM = new BranchModel();
-            //el nombre no se puede repetir (en la BD es UNIQUE)
+            //el nombre no se puede repetir
             if ($branchM->nameExists($inputJSON->name)) {
                 $response->toJSON(null, "Ya existe una sucursal con ese nombre");
                 return;

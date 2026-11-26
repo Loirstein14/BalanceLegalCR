@@ -24,14 +24,14 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import ScheduleService from '../../services/ScheduleService';
 import BranchService from '../../services/BranchService';
 
-//tabla de horarios, se puede filtrar por sucursal
+//tabla de horarios con filtro por sucursal
 export default function TableSchedules() {
   const [data, setData] = useState([]);
   const [error, setError] = useState('');
   const [loaded, setLoaded] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  //sucursal del filtro, '' son todas
+  //sin filtro son todas
   const [branchId, setBranchId] = useState('');
 
   const [dataBranches, setDataBranches] = useState([]);
@@ -55,7 +55,7 @@ export default function TableSchedules() {
         setLoaded(true);
       })
       .catch((error) => {
-        //si la sucursal no tiene horarios el API da error y la tabla queda vacía
+        //si no hay horarios la tabla queda vacía
         console.log(error);
         setData([]);
         setLoaded(true);

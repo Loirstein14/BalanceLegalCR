@@ -1,6 +1,5 @@
 <?php
-//los encargados son users con role_id = 2
-//un encargado es de una sola sucursal, se guarda en users.branch_id
+//los encargados son users con role_id 2
 class BranchModel
 {
     public $enlace;
@@ -55,8 +54,7 @@ class BranchModel
             handleException($e);
         }
     }
-    //encargados que se pueden escoger: los que no tienen sucursal
-    //y si se está editando, también los que ya son de esa sucursal
+    //encargados libres y los de esta sucursal
     public function availableManagers($idBranch = 0)
     {
         try {
@@ -71,7 +69,7 @@ class BranchModel
             handleException($e);
         }
     }
-    //ver si ya hay otra sucursal con ese nombre (al editar no se compara con ella misma)
+    //ver si ya hay otra sucursal con ese nombre
     public function nameExists($name, $idBranch = 0)
     {
         try {
@@ -94,8 +92,7 @@ class BranchModel
                 $objeto->phone,
                 $objeto->email,
             ]);
-            //encargados: a cada uno se le pone el id de la sucursal
-            //solo si sigue sin sucursal, para no quitárselo a otra
+            //se asigna cada encargado si sigue libre
             foreach ($objeto->managers as $idManager) {
                 $sql = "UPDATE users SET branch_id = ?
                         WHERE id = ? AND role_id = 2 AND branch_id IS NULL;";
@@ -121,8 +118,7 @@ class BranchModel
                 $objeto->email,
                 $objeto->id,
             ]);
-            //encargados: igual que los géneros de las películas, primero se sueltan
-            //los que tenía y luego se asignan los que vienen del form
+            //se sueltan los encargados y se vuelven a asignar
             $sql = "UPDATE users SET branch_id = NULL WHERE branch_id = ? AND role_id = 2;";
             $vResultadoD = $this->enlace->executeSQL_DML($sql, [$objeto->id]);
             foreach ($objeto->managers as $idManager) {

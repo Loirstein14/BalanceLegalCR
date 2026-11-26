@@ -7,9 +7,9 @@ SelectBranchService.propTypes = {
   data: PropTypes.array,
   field: PropTypes.object,
 };
-//servicios de la sucursal, con la duración y el precio
+//servicios de la sucursal con duración y precio
 export function SelectBranchService({ field, data }) {
-  //60 -> '1 hora', 120 -> '2 horas'
+  //pasa los minutos a horas
   const duration = (minutes) => {
     const hours = minutes / 60;
     return hours === 1 ? '1 hora' : hours + ' horas';

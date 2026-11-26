@@ -1,4 +1,3 @@
-//https://mui.com/material-ui/react-table/#sorting-amp-selecting
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
@@ -62,16 +61,14 @@ function stableSort(array, comparator) {
   return stabilizedThis.map((el) => el[0]);
 }
 
-//color del estado con los colores del tema de MUI
-//1 proforma naranja, 2 facturado verde, 3 anulada gris
+//color según el estado de la factura
 const statusColor = (statusId) => {
   if (statusId === 1) return 'warning';
   if (statusId === 2) return 'success';
   return 'default';
 };
 
-//máximo 4 columnas, el estado va debajo del número de factura
-//la fecha se ordena con invoice_datetime y se muestra con invoice_date
+//máximo 4 columnas
 const headCells = [
   { id: 'number', numeric: false, label: 'Factura' },
   { id: 'invoice_datetime', numeric: false, label: 'Fecha' },
@@ -124,8 +121,7 @@ TableInvoicesHead.propTypes = {
   orderBy: PropTypes.string.isRequired,
 };
 
-//historial de facturas de la sucursal del encargado, la más nueva primero
-//se puede filtrar por cliente y/o fecha
+//historial de facturas con filtros
 export default function TableInvoices() {
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
@@ -150,7 +146,7 @@ export default function TableInvoices() {
   const [orderBy, setOrderBy] = useState('invoice_datetime');
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  //filtros, '' es sin filtro
+  //filtros vacíos al inicio
   const [clientId, setClientId] = useState('');
   const [date, setDate] = useState('');
 
@@ -172,15 +168,14 @@ export default function TableInvoices() {
   if (!loaded) return <p>Cargando...</p>;
   if (error) return <p>Error: {error.message}</p>;
 
-  //clientes que tienen facturas, sin repetir, para el select del filtro
+  //clientes sin repetir para el filtro
   const clients = data
     ? data
         .filter((row, index) => data.findIndex((item) => item.client_id === row.client_id) === index)
         .sort((a, b) => a.client.localeCompare(b.client))
     : [];
 
-  //se filtra la lista que ya vino del API, no se vuelve a llamar
-  //invoice_datetime viene 'aaaa-mm-dd hh:mm:ss' y el input de fecha da 'aaaa-mm-dd'
+  //se filtra la lista sin volver a llamar al API
   const filtered = data
     ? data.filter(
         (row) =>

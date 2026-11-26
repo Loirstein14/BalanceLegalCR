@@ -12,7 +12,6 @@ class ServiceService {
     return axios.get(BASE_URL + '/' + ServiceId);
   }
   //servicios activos de una sucursal
-  //localhost/appbalancelegalcr/apibalancelegalcr/service/getByBranch/1
   getServicesByBranch(BranchId) {
     return axios.get(BASE_URL + '/getByBranch/' + BranchId);
   }

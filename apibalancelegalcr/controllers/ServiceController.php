@@ -14,8 +14,7 @@ class service
             handleException($e);
         }
     }
-    //GET Obtener
-    //localhost/appbalancelegalcr/apibalancelegalcr/service/1
+    //GET obtener
     public function get($id)
     {
         try {
@@ -27,8 +26,7 @@ class service
             handleException($e);
         }
     }
-    //GET servicios que ofrece una sucursal
-    //localhost/appbalancelegalcr/apibalancelegalcr/service/getByBranch/1
+    //GET servicios que da una sucursal
     public function getByBranch($idBranch)
     {
         try {
@@ -48,7 +46,7 @@ class service
             $response = new Response();
             $inputJSON = $request->getJSON();
             $serviceM = new ServiceModel();
-            //el nombre no se puede repetir (en la BD es UNIQUE)
+            //el nombre no se puede repetir
             if ($serviceM->nameExists($inputJSON->name)) {
                 $response->toJSON(null, "Ya existe un servicio con ese nombre");
                 return;

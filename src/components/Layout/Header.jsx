@@ -21,7 +21,7 @@ const navItems = [
   { name: 'Reservas', link: '/appointment' },
 ];
 
-//submenú de mantenimientos (las tablas para listar, crear y editar)
+//submenú de mantenimientos
 const maintenanceItems = [
   { name: 'Productos', link: '/product-table' },
   { name: 'Servicios', link: '/service-table' },
@@ -41,7 +41,7 @@ export default function Header() {
     setAnchorElPrincipal(null);
   };
 
-  //abrir y cerrar el submenú de mantenimientos (pantallas grandes)
+  //abrir y cerrar el submenú
   const [anchorElMaintenance, setAnchorElMaintenance] = React.useState(null);
   const handleCloseMaintenanceMenu = () => {
     setAnchorElMaintenance(null);

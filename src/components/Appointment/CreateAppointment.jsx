@@ -25,10 +25,10 @@ import { SelectClient } from './Form/SelectClient';
 import { SelectBranchService } from './Form/SelectBranchService';
 import { SelectAvailableHour } from './Form/SelectAvailableHour';
 
-//registrar reserva: la hace el encargado fijo en su sucursal y escoge al cliente
+//registrar reserva del encargado
 export function CreateAppointment() {
   const navigate = useNavigate();
-  //fecha de hoy: aaaa-mm-dd para comparar con el input y dd/mm/aaaa para mostrarla
+  //fecha de hoy en los dos formatos
   const today = format(new Date(), 'yyyy-MM-dd');
   const todayText = format(new Date(), 'dd/MM/yyyy');
 
@@ -42,7 +42,7 @@ export function CreateAppointment() {
       //la fecha no puede ser antes de hoy
       .test('fecha-no-pasada', 'La fecha no puede ser anterior a hoy', (value) => !value || value >= today),
     start_time: yup.string().required('Seleccione la hora'),
-    //una respuesta por pregunta, las reglas dependen del answer_type
+    //las reglas dependen del tipo de pregunta
     answers: yup.array().of(
       yup.object({
         answer_text: yup
@@ -84,7 +84,7 @@ export function CreateAppointment() {
   const [error, setError] = useState('');
   const onError = (errors, e) => console.log(errors, e);
 
-  //encargado y su sucursal, los manda el API
+  //encargado y su sucursal
   const [manager, setManager] = useState(null);
   const [dataServices, setDataServices] = useState([]);
   useEffect(() => {
@@ -104,7 +104,7 @@ export function CreateAppointment() {
       });
   }, []);
 
-  //estado inicial con su color, no se puede cambiar
+  //estado inicial con su color
   const [status, setStatus] = useState(null);
   useEffect(() => {
     AppointmentService.getInitialStatus()
@@ -129,13 +129,13 @@ export function CreateAppointment() {
       });
   }, []);
 
-  //preguntas: se pintan según su tipo y cada una tiene su respuesta en el form
+  //preguntas de la reserva
   const [questions, setQuestions] = useState([]);
   useEffect(() => {
     QuestionService.getQuestions()
       .then((response) => {
         setQuestions(response.data);
-        //una respuesta vacía por pregunta, answer_type e is_required los usa yup
+        //una respuesta vacía por pregunta
         setValue(
           'answers',
           response.data.map((question) => ({
@@ -152,20 +152,20 @@ export function CreateAppointment() {
       });
   }, [setValue]);
 
-  //horas libres: se vuelven a pedir cada vez que cambia la fecha o el servicio
+  //horas libres según la fecha y el servicio
   const date = watch('date');
   const serviceId = watch('service_id');
   //solo se consulta si ya hay servicio y una fecha válida
   const readyHours = Boolean(serviceId) && Boolean(date) && date >= today;
   const [hours, setHours] = useState([]);
   const [hoursMessage, setHoursMessage] = useState('');
-  //se le suma 1 cuando el API rechaza la hora (alguien más la agarró) para recargar
+  //sirve para recargar las horas
   const [reloadHours, setReloadHours] = useState(0);
   useEffect(() => {
-    //si cambió la fecha o el servicio la hora escogida ya no sirve
+    //si cambia la fecha o el servicio se borra la hora
     setValue('start_time', '');
     if (!readyHours) return;
-    //active es para que una respuesta vieja no pise la lista nueva
+    //para que una respuesta vieja no pise la nueva
     let active = true;
     AppointmentService.getAvailableHours(date, serviceId)
       .then((response) => {
@@ -191,7 +191,7 @@ export function CreateAppointment() {
   const onSubmit = (DataForm) => {
     console.log('Formulario:');
     console.log(DataForm);
-    //el API solo ocupa question_id y answer_text de cada respuesta
+    //solo se manda question_id y answer_text
     const appointment = {
       client_id: DataForm.client_id,
       service_id: DataForm.service_id,
@@ -218,7 +218,7 @@ export function CreateAppointment() {
         })
         .catch((error) => {
           console.log(error);
-          //el API manda el mensaje de la regla que falló (ej la hora ya se ocupó)
+          //el API manda el mensaje del error
           toast.error(
             typeof error.response?.data === 'string' && error.response.data
               ? error.response.data
@@ -233,7 +233,7 @@ export function CreateAppointment() {
     }
   };
 
-  //campo de la respuesta según el tipo: texto, sí/no o número
+  //campo según el tipo de pregunta
   const answerInput = (question, index, field) => {
     const answerError = errors.answers?.[index]?.answer_text;
     if (question.answer_type === 'yes_no') {
@@ -272,7 +272,7 @@ export function CreateAppointment() {
             <Typography variant="h5" gutterBottom sx={{ flexGrow: 1 }}>
               Registrar Reserva
             </Typography>
-            {/* estado inicial con su color, no se puede cambiar */}
+            {/* estado inicial con su color */}
             {status && (
               <Chip
                 label={`Estado: ${status.name}`}

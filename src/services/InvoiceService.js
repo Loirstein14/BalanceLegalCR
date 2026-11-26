@@ -3,8 +3,7 @@ import axios from 'axios';
 const BASE_URL = import.meta.env.VITE_BASE_URL + 'invoice';
 
 class InvoiceService {
-  //facturas de la sucursal del encargado, la más nueva primero
-  //localhost/appbalancelegalcr/apibalancelegalcr/invoice
+  //facturas de la sucursal del encargado
   getInvoices() {
     return axios.get(BASE_URL);
   }
@@ -12,16 +11,15 @@ class InvoiceService {
   getInvoiceById(InvoiceId) {
     return axios.get(BASE_URL + '/' + InvoiceId);
   }
-  //encabezado: encargado, sucursal y % de impuesto
-  //localhost/appbalancelegalcr/apibalancelegalcr/invoice/header
+  //encabezado de la factura
   getHeader() {
     return axios.get(BASE_URL + '/header');
   }
-  //crear factura, los totales los calcula el API con los precios de la BD
+  //crear factura
   createInvoice(Invoice) {
     return axios.post(BASE_URL, JSON.stringify(Invoice));
   }
-  //facturar una proforma, el id va dentro del objeto con las líneas
+  //facturar una proforma
   issueProforma(Invoice) {
     return axios({
       method: 'put',

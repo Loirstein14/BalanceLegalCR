@@ -59,7 +59,7 @@ export function CreateService() {
 
   const onError = (errors, e) => console.log(errors, e);
 
-  //imagen escogida y su vista previa (igual que en MovieUploadImage)
+  //imagen escogida y su vista previa
   const [file, setFile] = useState(null);
   const [fileURL, setFileURL] = useState(null);
   function handleChange(e) {
@@ -68,7 +68,7 @@ export function CreateService() {
       setFile(e.target.files[0]);
     }
   }
-  //la imagen se sube después de crear el servicio porque ocupa el id
+  //la imagen se sube después porque ocupa el id
   const saveImage = (idService) => {
     if (!file) {
       return navigate('/service-table');
@@ -81,7 +81,7 @@ export function CreateService() {
       .then(() => navigate('/service-table'))
       .catch((error) => {
         console.log(error);
-        //el servicio sí se creó, entonces se manda a editar para volver a intentar con la imagen
+        //si falla la imagen se manda a editar
         toast.error(typeof error.response?.data === 'string' ? error.response.data : 'No se pudo subir la imagen');
         navigate(`/service/update/${idService}`);
       });
@@ -103,7 +103,7 @@ export function CreateService() {
         })
         .catch((error) => {
           console.log(error);
-          //si el API manda un mensaje (ej nombre repetido) se le enseña al usuario
+          //el API manda el mensaje del error
           toast.error(
             typeof error.response?.data === 'string' && error.response.data
               ? error.response.data
@@ -221,7 +221,7 @@ export function CreateService() {
             </FormControl>
           </Grid>
           <Grid size={12}>
-            {/* imagen opcional, se sube con FormData después de guardar */}
+            {/* imagen opcional */}
             <FormControl variant="standard" fullWidth sx={{ m: 1 }}>
               <Typography variant="subtitle1">Imagen (JPG, PNG o GIF, máximo 2 MB)</Typography>
               <input type="file" accept="image/*" onChange={handleChange} />

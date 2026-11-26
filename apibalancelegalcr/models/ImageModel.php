@@ -1,13 +1,10 @@
 <?php
-//igual al ImageModel del ejemplo del profe, solo que aquí la imagen no va en
-//una tabla aparte, se guarda el nombre del archivo en image_path del
-//producto o del servicio
+//igual al ImageModel del profe pero con image_path
 class ImageModel
 {
     private $upload_path = 'uploads/';
     private $valid_extensions = array('jpeg', 'jpg', 'png', 'gif');
-    //según el type que mande react se escoge la tabla, así nunca se mete
-    //en el SQL un nombre de tabla que venga del navegador
+    //la tabla se escoge según el type que llega
     private $tables = array('product' => 'products', 'service' => 'services');
 
     public $enlace;
@@ -15,8 +12,7 @@ class ImageModel
     {
         $this->enlace = new MySqlConnect();
     }
-    //subir la imagen de un producto o servicio que ya existe
-    //llega: file, type (product o service) e id
+    //subir la imagen de un producto o servicio
     public function uploadFile($object)
     {
         try {
@@ -38,7 +34,7 @@ class ImageModel
                 if (in_array($fileActExt, $this->valid_extensions)) {
                     //Validar que no exista
                     if (!file_exists($this->upload_path . $fileName)) {
-                        //Validar que no sobrepase el tamaño (2 MB)
+                        //validar que no pase de 2 MB
                         if ($fileSize < 2000000 && $fileError == 0) {
                             //Moverlo a la carpeta del servidor del API
                             if (move_uploaded_file($tempPath, $this->upload_path . $fileName)) {

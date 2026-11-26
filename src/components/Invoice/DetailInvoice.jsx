@@ -22,7 +22,7 @@ import { DollarTotal } from './DollarTotal';
 const money = (value) =>
   '₡' + Number(value).toLocaleString('es-CR', { minimumFractionDigits: 2 });
 
-//detalle de una factura: encabezado, líneas y totales
+//detalle de una factura
 export function DetailInvoice() {
   const routeParams = useParams();
   const navigate = useNavigate();
@@ -130,7 +130,7 @@ export function DetailInvoice() {
                 <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Total a pagar</Typography>
                 <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{money(data.total)}</Typography>
               </Box>
-              {/* total en dólares (web service de Hacienda) */}
+              {/* total en dólares */}
               <Box sx={{ mt: 1 }}>
                 <DollarTotal total={Number(data.total)} />
               </Box>

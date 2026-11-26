@@ -6,8 +6,7 @@ class UserModel
     {
         $this->enlace = new MySqlConnect(); //Conectarse a la BD
     }
-    //clientes activos (role_id 1) para el select de reserva y factura
-    //va el nombre completo y el correo para mostrarlos al escoger
+    //clientes activos con nombre y correo
     public function allCustomer()
     {
         try {
@@ -21,7 +20,7 @@ class UserModel
             handleException($e);
         }
     }
-    //un cliente activo por id, para validar el que viene en la reserva
+    //un cliente activo por id
     public function getCustomer($id)
     {
         try {
@@ -37,8 +36,7 @@ class UserModel
             handleException($e);
         }
     }
-    //encargado (role_id 2) con su sucursal y su registro en providers
-    //provider_id es el abogado de la cita: la atiende el encargado que la registra
+    //encargado con su sucursal y su provider
     public function getManager($idManager)
     {
         try {

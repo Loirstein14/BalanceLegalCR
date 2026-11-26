@@ -20,7 +20,7 @@ import { SelectWeekdays } from '../Schedule/Form/SelectWeekdays';
 
 export function CreateBlock() {
   const navigate = useNavigate();
-  //hoy en aaaa-mm-dd, el mismo formato del input de fecha
+  //fecha de hoy en aaaa-mm-dd
   const today = new Date().toLocaleDateString('en-CA');
   //validaciones
   const blockSchema = yup.object({
@@ -28,7 +28,7 @@ export function CreateBlock() {
       .number()
       .typeError('Seleccione una sucursal')
       .required('La sucursal es requerida'),
-    //se crea un bloqueo por cada día del rango que caiga en los días marcados
+    //rango de fechas
     start_date: yup
       .string()
       .required('La fecha inicial es requerida')
@@ -37,11 +37,11 @@ export function CreateBlock() {
     end_date: yup
       .string()
       .required('La fecha final es requerida')
-      //this.parent son los otros campos, aquí se compara con la fecha inicial
+      //se compara con la fecha inicial
       .test('fecha-final', 'La fecha final debe ser igual o posterior a la inicial', function (value) {
         return !value || !this.parent.start_date || value >= this.parent.start_date;
       })
-      //máximo 3 meses, igual que en el API
+      //máximo 3 meses
       .test('maximo-3-meses', 'El rango puede ser de máximo 3 meses', function (value) {
         return (
           !value ||
@@ -54,7 +54,7 @@ export function CreateBlock() {
     end_time: yup
       .string()
       .required('La hora final es requerida')
-      //this.parent son los otros campos, aquí se compara con la hora inicial
+      //se compara con la hora inicial
       .test('hora-final', 'La hora final debe ser mayor a la hora inicial', function (value) {
         return !value || !this.parent.start_time || value > this.parent.start_time;
       }),
@@ -82,20 +82,20 @@ export function CreateBlock() {
   const [error, setError] = useState('');
   const onError = (errors, e) => console.log(errors, e);
 
-  //vista previa en tiempo real de las fechas que se van a crear (el mismo cálculo del API)
+  //vista previa de las fechas que se van a crear
   const [startDate, endDate, weekdays] = watch(['start_date', 'end_date', 'weekdays']);
   const rangeOk =
     Boolean(startDate) &&
     Boolean(endDate) &&
     endDate >= startDate &&
     differenceInCalendarDays(parseISO(endDate), parseISO(startDate)) <= 92;
-  //eachDayOfInterval da todos los días del rango y getISODay 1 (lunes) a 7 (domingo)
+  //días del rango que caen en los días marcados
   const dates = rangeOk
     ? eachDayOfInterval({ start: parseISO(startDate), end: parseISO(endDate) }).filter((day) =>
         weekdays.includes(getISODay(day)),
       )
     : [];
-  //fecha corta para la vista previa: 'lun 07/12'
+  //fecha corta para la vista previa
   const shortDate = (day) => format(day, 'EEE dd/MM', { locale: es });
 
   const onSubmit = (DataForm) => {
@@ -105,7 +105,7 @@ export function CreateBlock() {
       BlockService.createBlock(DataForm)
         .then((response) => {
           if (response.data != null) {
-            //el API devuelve la lista de bloqueos creados, uno por fecha
+            //el API devuelve los bloqueos creados
             const first = response.data[0];
             const last = response.data[response.data.length - 1];
             toast.success(
@@ -122,7 +122,7 @@ export function CreateBlock() {
         })
         .catch((error) => {
           console.log(error);
-          //el API manda el mensaje de la regla que falló (ej un traslape)
+          //el API manda el mensaje del error
           toast.error(
             typeof error.response?.data === 'string' && error.response.data
               ? error.response.data

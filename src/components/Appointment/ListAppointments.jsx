@@ -25,12 +25,12 @@ import AddIcon from '@mui/icons-material/Add';
 import { Link } from 'react-router-dom';
 import AppointmentService from '../../services/AppointmentService';
 
-//historial de reservas del encargado, se puede filtrar por cliente y/o fecha
+//historial de reservas con filtros
 export function ListAppointments() {
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
   const [loaded, setLoaded] = useState(false);
-  //filtros, '' es sin filtro
+  //filtros vacíos al inicio
   const [clientId, setClientId] = useState('');
   const [date, setDate] = useState('');
 
@@ -52,16 +52,14 @@ export function ListAppointments() {
   if (!loaded) return <p>Cargando...</p>;
   if (error) return <p>Error: {error.message}</p>;
 
-  //clientes que tienen reservas, sin repetir, para el select del filtro
-  //findIndex da la primera posición del cliente: si es la misma fila es la primera vez que sale
+  //clientes sin repetir para el filtro
   const clients = data
     ? data
         .filter((row, index) => data.findIndex((item) => item.client_id === row.client_id) === index)
         .sort((a, b) => a.client.localeCompare(b.client))
     : [];
 
-  //se filtra la lista que ya vino del API, no se vuelve a llamar
-  //starts_at viene 'aaaa-mm-dd hh:mm:ss' y el input de fecha da 'aaaa-mm-dd'
+  //se filtra la lista sin volver a llamar al API
   const filtered = data
     ? data.filter(
         (row) =>

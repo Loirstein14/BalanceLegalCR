@@ -1,6 +1,5 @@
 <?php
-//horarios de cada sucursal por fecha (tabla branch_schedules)
-//las horas van en horas completas (08:00, 09:00...) como dijo el profe
+//horarios de cada sucursal por fecha
 class ScheduleModel
 {
     public $enlace;
@@ -8,12 +7,12 @@ class ScheduleModel
     {
         $this->enlace = new MySqlConnect(); //Conectarse a la BD
     }
-    //las horas sin segundos y la fecha en dd/mm/aaaa para mostrarla
+    //horas sin segundos y fecha en dd/mm/aaaa
     private $campos = "s.id, s.branch_id, b.name AS branch, s.schedule_date,
                        DATE_FORMAT(s.schedule_date, '%d/%m/%Y') AS date_text,
                        TIME_FORMAT(s.start_time, '%H:%i') AS start_time,
                        TIME_FORMAT(s.end_time, '%H:%i') AS end_time";
-    //horarios, los de hoy en adelante primero
+    //horarios de hoy en adelante primero
     public function all()
     {
         try {
@@ -56,9 +55,7 @@ class ScheduleModel
             handleException($e);
         }
     }
-    //busca un horario de la misma sucursal y fecha que choque con el rango
-    //chocan si uno empieza antes de que el otro termine y termina después de que el otro empieza
-    //$idSchedule es para que al editar no choque consigo mismo
+    //busca un horario que choque ese día
     public function getOverlap($idBranch, $date, $start, $end, $idSchedule = 0)
     {
         try {
@@ -77,7 +74,7 @@ class ScheduleModel
             handleException($e);
         }
     }
-    //ver si una fecha ya pasó, se le pregunta a MySQL para usar la fecha de la BD
+    //ver si la fecha ya pasó según MySQL
     public function isPastDate($date)
     {
         try {
@@ -88,8 +85,7 @@ class ScheduleModel
             handleException($e);
         }
     }
-    //reglas del rango de fechas (lo usan horarios y bloqueos)
-    //devuelve el mensaje del error o null si todo bien
+    //reglas del rango de fechas devuelve el error o null
     public function checkRange($objeto)
     {
         if (empty($objeto->start_date) || empty($objeto->end_date)
@@ -103,12 +99,12 @@ class ScheduleModel
         if ($objeto->end_date < $objeto->start_date) {
             return "La fecha final debe ser igual o posterior a la fecha inicial";
         }
-        //máximo 3 meses por rango, para no crear cientos de registros por error
+        //máximo 3 meses por rango
         $dias = (strtotime($objeto->end_date) - strtotime($objeto->start_date)) / 86400;
         if ($dias > 92) {
             return "El rango puede ser de máximo 3 meses";
         }
-        //al menos un día, del 1 (lunes) al 7 (domingo)
+        //al menos un día de la semana
         if (empty($objeto->weekdays) || !is_array($objeto->weekdays)) {
             return "Seleccione al menos un día de la semana";
         }
@@ -120,15 +116,13 @@ class ScheduleModel
         return null;
     }
     //fechas del rango que caen en los días marcados
-    //$weekdays va con la numeración ISO: 1 lunes ... 7 domingo
-    //ej: del 2026-11-30 al 2026-12-06 con [1,2,3,4,5] da lunes 30 a viernes 4
     public function datesInRange($startDate, $endDate, $weekdays)
     {
         $dates = [];
         $date = new DateTime($startDate);
         $end = new DateTime($endDate);
         while ($date <= $end) {
-            //format('N') da el día de la semana: 1 (lunes) a 7 (domingo)
+            //N da el día de la semana de 1 a 7
             if (in_array((int) $date->format('N'), $weekdays)) {
                 $dates[] = $date->format('Y-m-d');
             }

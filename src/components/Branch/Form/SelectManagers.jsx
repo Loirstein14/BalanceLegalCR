@@ -7,8 +7,7 @@ SelectManagers.propTypes = {
   data: PropTypes.array,
   field: PropTypes.object,
 };
-//encargados, selección múltiple igual que SelectGenres del profe
-//vienen los que no tienen sucursal y al editar también los de esa sucursal
+//encargados igual que SelectGenres del profe
 export function SelectManagers({ field, data }) {
   return (
     <>

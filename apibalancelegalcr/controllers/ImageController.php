@@ -2,7 +2,7 @@
 //localhost/appbalancelegalcr/apibalancelegalcr/image
 class image
 {
-    //POST subir imagen, llega como form-data: file, type e id
+    //POST subir imagen con file type e id
     public function create()
     {
         try {

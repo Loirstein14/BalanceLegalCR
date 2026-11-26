@@ -1,14 +1,12 @@
 <?php
 class appointment
 {
-    //encargado fijo, si se ocupa ver otro se cambia aquí y en InvoiceController
-    //2 = Adrián Pérez, Oficina Central
+    //encargado fijo 2 Adrián Pérez se cambia aquí y en InvoiceController
     private $idManager = 2;
-    //estado con el que queda la reserva nueva: 1 = Pendiente
+    //estado de la reserva nueva 1 Pendiente
     private $initialStatus = 1;
 
     //GET historial de reservas del encargado
-    //localhost/appbalancelegalcr/apibalancelegalcr/appointment
     public function index()
     {
         try {
@@ -21,7 +19,6 @@ class appointment
         }
     }
     //GET reserva por id
-    //localhost/appbalancelegalcr/apibalancelegalcr/appointment/1
     public function get($id)
     {
         try {
@@ -33,8 +30,7 @@ class appointment
             handleException($e);
         }
     }
-    //GET encargado y su sucursal, para el encabezado del form de reserva
-    //localhost/appbalancelegalcr/apibalancelegalcr/appointment/manager
+    //GET encargado y su sucursal
     public function manager()
     {
         try {
@@ -46,13 +42,12 @@ class appointment
             handleException($e);
         }
     }
-    //GET horas libres para un servicio en una fecha (aaaa-mm-dd)
-    //localhost/appbalancelegalcr/apibalancelegalcr/appointment/availableHours/2026-11-25/1
+    //GET horas libres de un servicio en una fecha
     public function availableHours($date, $idService)
     {
         try {
             $response = new Response();
-            //que la fecha venga bien y que exista (nada de 2026-02-30)
+            //que la fecha venga bien y que exista
             $parts = explode('-', $date);
             if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) || !checkdate($parts[1], $parts[2], $parts[0])) {
                 $response->toJSON(null, "La fecha no es válida");
@@ -68,8 +63,7 @@ class appointment
             handleException($e);
         }
     }
-    //GET estado inicial con su color, en el form no se puede cambiar
-    //localhost/appbalancelegalcr/apibalancelegalcr/appointment/initialStatus
+    //GET estado inicial con su color
     public function initialStatus()
     {
         try {
@@ -81,15 +75,14 @@ class appointment
             handleException($e);
         }
     }
-    //POST crear reserva, con sus respuestas y la proforma
-    //localhost/appbalancelegalcr/apibalancelegalcr/appointment
+    //POST crear reserva con respuestas y proforma
     public function create()
     {
         try {
             $request = new Request();
             $response = new Response();
             $inputJSON = $request->getJSON();
-            //sucursal y abogado salen del encargado, no de lo que mande react
+            //la sucursal y el abogado salen del encargado
             $userM = new UserModel();
             $manager = $userM->getManager($this->idManager);
             //si alguna regla falla se le devuelve el mensaje
@@ -105,7 +98,7 @@ class appointment
             handleException($e);
         }
     }
-    //reglas de la reserva, devuelve el mensaje del error o null si todo bien
+    //reglas de la reserva devuelve el error o null
     private function validar($objeto, $manager)
     {
         $userM = new UserModel();
@@ -114,7 +107,7 @@ class appointment
         if (empty($objeto->client_id) || empty($objeto->service_id) || empty($objeto->date) || empty($objeto->start_time)) {
             return "Faltan datos de la reserva: cliente, servicio, fecha y hora son requeridos";
         }
-        //el cliente tiene que existir, estar activo y ser rol cliente
+        //el cliente tiene que existir y estar activo
         if (empty($userM->getCustomer($objeto->client_id))) {
             return "El cliente seleccionado no existe o no está activo";
         }
@@ -127,8 +120,7 @@ class appointment
         if ($scheduleM->isPastDate($objeto->date)) {
             return "La fecha de la reserva no puede ser anterior a hoy";
         }
-        //la hora tiene que estar en las horas libres, availableHours ya revisa
-        //el horario, los bloqueos, las otras citas y que el servicio sea de la sucursal
+        //la hora tiene que estar en las horas libres
         $hours = $appointmentM->availableHours($manager->branch_id, $objeto->date, $objeto->service_id);
         $disponible = false;
         foreach ($hours as $hour) {
@@ -139,7 +131,7 @@ class appointment
         if (!$disponible) {
             return "La hora seleccionada ya no está disponible para ese servicio. Escoja otra hora";
         }
-        //preguntas: las obligatorias contestadas y con el tipo correcto
+        //las preguntas obligatorias tienen que venir bien
         $answers = isset($objeto->answers) && is_array($objeto->answers) ? $objeto->answers : [];
         $questions = $questionM->all();
         foreach ($questions as $question) {

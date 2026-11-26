@@ -14,8 +14,7 @@ class block
             handleException($e);
         }
     }
-    //GET Obtener
-    //localhost/appbalancelegalcr/apibalancelegalcr/block/1
+    //GET obtener
     public function get($id)
     {
         try {
@@ -28,7 +27,6 @@ class block
         }
     }
     //GET bloqueos de una sucursal
-    //localhost/appbalancelegalcr/apibalancelegalcr/block/getByBranch/1
     public function getByBranch($idBranch)
     {
         try {
@@ -40,9 +38,7 @@ class block
             handleException($e);
         }
     }
-    //POST crear bloqueos por rango de fechas
-    //llega: branch_id, start_date, end_date, weekdays (1 lunes ... 7 domingo), start_time, end_time, reason
-    //se crea un bloqueo por cada día del rango que caiga en los días marcados
+    //POST crea un bloqueo por cada día del rango
     public function create()
     {
         try {
@@ -50,7 +46,7 @@ class block
             $response = new Response();
             $inputJSON = $request->getJSON();
             $scheduleM = new ScheduleModel();
-            //revisar el rango, mismas reglas que horarios
+            //revisar el rango igual que en horarios
             $mensaje = $scheduleM->checkRange($inputJSON);
             if ($mensaje) {
                 $response->toJSON(null, $mensaje);
@@ -61,7 +57,7 @@ class block
                 $response->toJSON(null, "Ninguna fecha del rango cae en los días de la semana seleccionados");
                 return;
             }
-            //todo o nada: primero se revisan todas las fechas, si una falla no se guarda ninguna
+            //si una fecha falla no se guarda ninguna
             $errores = [];
             foreach ($dates as $date) {
                 $inputJSON->block_date = $date;
@@ -71,13 +67,13 @@ class block
                 }
             }
             if (count($errores) > 0) {
-                //solo se muestran 3 fechas para que el mensaje no quede enorme
+                //solo se enseñan 3 fechas en el mensaje
                 $response->toJSON(null, "No se guardó ningún bloqueo. Revise estas fechas: "
                     . implode(" | ", array_slice($errores, 0, 3))
                     . (count($errores) > 3 ? " | y " . (count($errores) - 3) . " más" : ""));
                 return;
             }
-            //quién creó el bloqueo: por ahora el admin (1), cuando haya login se toma del usuario
+            //por ahora lo crea el admin hasta que haya login
             $inputJSON->created_by = 1;
             $blockM = new BlockModel();
             $result = [];
@@ -110,7 +106,7 @@ class block
             handleException($e);
         }
     }
-    //reglas del bloqueo, devuelve el mensaje del error o null si todo bien
+    //reglas del bloqueo devuelve el error o null
     private function validar($objeto, $idBlock = 0)
     {
         $scheduleM = new ScheduleModel();
@@ -121,13 +117,12 @@ class block
         if ($objeto->end_time <= $objeto->start_time) {
             return "La hora final debe ser mayor a la hora inicial";
         }
-        //no se puede montar encima de otro bloqueo de la sucursal ese día
+        //no puede chocar con otro bloqueo ese día
         $choque = $blockM->getOverlap($objeto->branch_id, $objeto->block_date, $objeto->start_time, $objeto->end_time, $idBlock);
         if ($choque) {
             return "Se traslapa con el bloqueo de $choque->start_time a $choque->end_time que ya tiene la sucursal ese día";
         }
-        //el bloqueo sí puede caer dentro del horario (ej almuerzo 12 a 1)
-        //para eso sirve, y las horas libres de las reservas ya lo restan
+        //el bloqueo sí puede caer dentro del horario
         return null;
     }
 }

@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 SelectDeliveryFormat.propTypes = {
   field: PropTypes.object,
 };
-//formato de entrega: los valores son los mismos del ENUM de la BD
+//mismos valores del ENUM de la BD
 export function SelectDeliveryFormat({ field }) {
   return (
     <>

@@ -24,14 +24,14 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import BlockService from '../../services/BlockService';
 import BranchService from '../../services/BranchService';
 
-//tabla de bloqueos (horas en que la sucursal no atiende), se puede filtrar por sucursal
+//tabla de bloqueos con filtro por sucursal
 export default function TableBlocks() {
   const [data, setData] = useState([]);
   const [error, setError] = useState('');
   const [loaded, setLoaded] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  //sucursal del filtro, '' son todas
+  //sin filtro son todas
   const [branchId, setBranchId] = useState('');
 
   const [dataBranches, setDataBranches] = useState([]);
@@ -55,7 +55,7 @@ export default function TableBlocks() {
         setLoaded(true);
       })
       .catch((error) => {
-        //si la sucursal no tiene bloqueos el API da error y la tabla queda vacía
+        //si no hay bloqueos la tabla queda vacía
         console.log(error);
         setData([]);
         setLoaded(true);

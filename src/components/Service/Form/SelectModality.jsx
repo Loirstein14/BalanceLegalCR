@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 SelectModality.propTypes = {
   field: PropTypes.object,
 };
-//modalidad: los valores son los mismos del ENUM de la BD
+//mismos valores del ENUM de la BD
 export function SelectModality({ field }) {
   return (
     <>

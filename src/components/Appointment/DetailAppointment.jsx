@@ -43,7 +43,7 @@ export function DetailAppointment() {
   if (!loaded) return <p>Cargando...</p>;
   if (error) return <p>Error: {error.message}</p>;
 
-  //fila etiqueta: valor
+  //fila del detalle
   const field = (label, value) => (
     <Typography variant="body1" sx={{ mb: 0.5 }}>
       <Box component="span" sx={{ fontWeight: 'bold' }}>

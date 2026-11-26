@@ -1,9 +1,9 @@
 import axios from 'axios';
-//ruta del API para subir imágenes, igual que en el ejemplo del profe
+//ruta del API para subir imágenes
 const BASE_URL = import.meta.env.VITE_BASE_URL + 'image';
 
 class ImageService {
-  //formData lleva: file (la imagen), type (product o service) e id
+  //formData lleva file type e id
   createImage(formData) {
     return axios.post(BASE_URL, formData, {
       headers: {

@@ -12,11 +12,10 @@ class ScheduleService {
     return axios.get(BASE_URL + '/' + ScheduleId);
   }
   //horarios de una sucursal
-  //localhost/appbalancelegalcr/apibalancelegalcr/schedule/getByBranch/1
   getSchedulesByBranch(BranchId) {
     return axios.get(BASE_URL + '/getByBranch/' + BranchId);
   }
-  //crear, llega un rango y el API crea uno por día
+  //crear horarios por rango
   createSchedule(Schedule) {
     return axios.post(BASE_URL, JSON.stringify(Schedule));
   }

@@ -41,7 +41,7 @@ export function UpdateBlock() {
         });
     }
   }, [id]);
-  //hoy en aaaa-mm-dd, el mismo formato del input de fecha
+  //fecha de hoy en aaaa-mm-dd
   const today = new Date().toLocaleDateString('en-CA');
   //validaciones
   const blockSchema = yup.object({
@@ -58,7 +58,7 @@ export function UpdateBlock() {
     end_time: yup
       .string()
       .required('La hora final es requerida')
-      //this.parent son los otros campos, aquí se compara con la hora inicial
+      //se compara con la hora inicial
       .test('hora-final', 'La hora final debe ser mayor a la hora inicial', function (value) {
         return !value || !this.parent.start_time || value > this.parent.start_time;
       }),
@@ -103,7 +103,7 @@ export function UpdateBlock() {
         })
         .catch((error) => {
           console.log(error);
-          //el API manda el mensaje de la regla que falló (ej un traslape)
+          //el API manda el mensaje del error
           toast.error(
             typeof error.response?.data === 'string' && error.response.data
               ? error.response.data

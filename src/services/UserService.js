@@ -3,8 +3,7 @@ import axios from 'axios';
 const BASE_URL = import.meta.env.VITE_BASE_URL + 'user';
 
 class UserService {
-  //clientes activos con nombre completo y correo
-  //localhost/appbalancelegalcr/apibalancelegalcr/user/allCustomer
+  //clientes con nombre y correo
   getCustomers() {
     return axios.get(BASE_URL + '/allCustomer');
   }

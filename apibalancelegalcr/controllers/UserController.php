@@ -2,8 +2,7 @@
 //localhost/appbalancelegalcr/apibalancelegalcr/user
 class user
 {
-    //GET clientes para los forms de reserva y factura
-    //localhost/appbalancelegalcr/apibalancelegalcr/user/allCustomer
+    //GET clientes para reservas y facturas
     public function allCustomer()
     {
         try {

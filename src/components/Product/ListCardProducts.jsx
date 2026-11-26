@@ -17,7 +17,7 @@ ListCardProducts.propTypes = {
   data: PropTypes.array,
 };
 
-//productos en tarjetas: imagen, nombre, categoría y precio
+//productos en tarjetas
 export function ListCardProducts({ data }) {
   //url de las imágenes que están en el API
   const BASE_URL = import.meta.env.VITE_BASE_URL + 'uploads';

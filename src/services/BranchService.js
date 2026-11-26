@@ -7,14 +7,11 @@ class BranchService {
   getBranches() {
     return axios.get(BASE_URL);
   }
-  //trae también sus encargados
-  //localhost/appbalancelegalcr/apibalancelegalcr/branch/1
+  //sucursal con sus encargados
   getBranchById(BranchId) {
     return axios.get(BASE_URL + '/' + BranchId);
   }
-  //encargados que se pueden escoger: los que no tienen sucursal
-  //y si se manda el id también los de esa sucursal
-  //localhost/appbalancelegalcr/apibalancelegalcr/branch/managers/1
+  //encargados que se pueden escoger
   getAvailableManagers(BranchId) {
     return axios.get(BASE_URL + '/managers' + (BranchId ? '/' + BranchId : ''));
   }

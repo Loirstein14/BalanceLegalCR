@@ -20,7 +20,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import BranchService from '../../services/BranchService';
 
-//tabla de sucursales: listar, ver detalle, crear y editar
+//tabla de sucursales
 export default function TableBranches() {
   const [data, setData] = useState(null);
   const [error, setError] = useState('');

@@ -14,8 +14,7 @@ class product
             handleException($e);
         }
     }
-    //GET Obtener
-    //localhost/appbalancelegalcr/apibalancelegalcr/product/1
+    //GET obtener
     public function get($id)
     {
         try {
@@ -35,7 +34,7 @@ class product
             $response = new Response();
             $inputJSON = $request->getJSON();
             $productM = new ProductModel();
-            //el nombre no se puede repetir (en la BD es UNIQUE)
+            //el nombre no se puede repetir
             if ($productM->nameExists($inputJSON->name)) {
                 $response->toJSON(null, "Ya existe un producto con ese nombre");
                 return;

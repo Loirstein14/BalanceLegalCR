@@ -6,9 +6,7 @@ class InvoiceModel
     {
         $this->enlace = new MySqlConnect(); //Conectarse a la BD
     }
-    //facturas de la sucursal del encargado, la más nueva primero
-    //fecha: la de emisión si ya está facturada, si no la de creación (proforma)
-    //status_id, client_id e invoice_datetime los ocupa react para el estado y los filtros
+    //facturas de la sucursal del encargado
     public function getByBranch($idBranch)
     {
         try {
@@ -36,7 +34,7 @@ class InvoiceModel
     {
         try {
             $itemM = new InvoiceItemModel();
-            //status_id, client_id, branch_id y appointment_id se ocupan al facturar una proforma
+            //estos ids se ocupan para facturar la proforma
             $vSql = "SELECT i.id, i.status_id, i.client_id, i.branch_id, i.appointment_id,
                             COALESCE(i.invoice_number, CONCAT('Proforma #', i.id)) AS number,
                             s.name AS status,
@@ -65,7 +63,7 @@ class InvoiceModel
             handleException($e);
         }
     }
-    //% de impuesto del negocio (business_settings, 13)
+    //porcentaje de impuesto del negocio
     public function getTaxRate()
     {
         try {
@@ -75,8 +73,7 @@ class InvoiceModel
             handleException($e);
         }
     }
-    //siguiente número: FAC-0001, FAC-0002...
-    //agarra el número más alto después de 'FAC-' y le suma 1
+    //siguiente número de factura FAC
     public function nextNumber()
     {
         try {
@@ -89,10 +86,7 @@ class InvoiceModel
             handleException($e);
         }
     }
-    //calcula las líneas y los totales con los precios de la BD, no con lo que mande react
-    //$items: [{product_id o service_id, quantity}]
-    //por línea: subtotal = precio x cantidad, impuesto = subtotal x 13%, total = subtotal + impuesto
-    //los totales de la factura son la suma de las líneas
+    //calcula líneas y totales con los precios de la BD
     public function calculateLines($items)
     {
         try {
@@ -135,7 +129,7 @@ class InvoiceModel
             handleException($e);
         }
     }
-    //guardar las líneas (se copia el nombre, precio e impuesto de este momento)
+    //guardar las líneas de la factura
     public function createItems($idInvoice, $lines)
     {
         try {
@@ -153,8 +147,7 @@ class InvoiceModel
             handleException($e);
         }
     }
-    //proforma de una reserva: una línea con el servicio, cantidad 1
-    //número, emisor y fecha de emisión quedan en NULL hasta que se facture
+    //proforma con el servicio de la reserva
     public function createProforma($idAppointment, $idClient, $idBranch, $service)
     {
         try {
@@ -172,8 +165,7 @@ class InvoiceModel
             handleException($e);
         }
     }
-    //factura nueva ya facturada (estado 2) con número, quién la emite y la fecha de hoy
-    //$manager trae la sucursal y el id del encargado
+    //factura nueva ya facturada
     public function create($objeto, $manager)
     {
         try {
@@ -192,13 +184,12 @@ class InvoiceModel
             handleException($e);
         }
     }
-    //facturar proforma: pasa a facturado (2) con su número, quién la emite y la fecha
-    //las líneas se cambian por las del form (se borran y se meten las nuevas)
+    //facturar proforma con las líneas del form
     public function issueProforma($idInvoice, $objeto, $manager)
     {
         try {
             $calc = $this->calculateLines($objeto->items);
-            //el status_id = 1 en el WHERE es para que solo se facture si todavía es proforma
+            //solo se factura si todavía es proforma
             $sql = "UPDATE invoices
                     SET invoice_number = ?, status_id = 2, issued_by = ?, issued_at = NOW(),
                         subtotal = ?, tax_total = ?, total = ?
@@ -208,7 +199,7 @@ class InvoiceModel
                 $calc->subtotal, $calc->tax_total, $calc->total,
                 $idInvoice,
             ]);
-            //borrar la pila: se quitan las líneas de la proforma
+            //borrar la pila de líneas de la proforma
             $sql = "DELETE FROM invoice_items WHERE invoice_id = ?;";
             $this->enlace->executeSQL_DML($sql, [$idInvoice]);
             $this->createItems($idInvoice, $calc->lines);
