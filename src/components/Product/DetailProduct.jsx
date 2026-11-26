@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
@@ -8,6 +8,7 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import EditIcon from '@mui/icons-material/Edit';
 import DescriptionIcon from '@mui/icons-material/Description';
 import ProductService from '../../services/ProductService';
 
@@ -87,7 +88,7 @@ export function DetailProduct() {
           </Grid>
         </Grid>
       )}
-      <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
+      <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center', gap: 2 }}>
         <Button
           variant="contained"
           color="primary"
@@ -96,7 +97,11 @@ export function DetailProduct() {
         >
           Regresar
         </Button>
+        {/* con el login este botón solo le sale al encargado y al admin */}
+        <Button variant="contained" startIcon={<EditIcon />} component={Link} to={`/product/update/${routeParams.id}`}>
+          Modificar
+        </Button>
       </Box>
     </Container>
   );
-}
+}
