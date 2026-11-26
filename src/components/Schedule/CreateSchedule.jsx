@@ -10,10 +10,13 @@ import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { differenceInCalendarDays, eachDayOfInterval, getISODay, parseISO, format } from 'date-fns';
+import { es } from 'date-fns/locale';
 import ScheduleService from '../../services/ScheduleService';
 import BranchService from '../../services/BranchService';
 import { SelectBranch } from './Form/SelectBranch';
 import { SelectHour } from './Form/SelectHour';
+import { SelectWeekdays } from './Form/SelectWeekdays';
 
 export function CreateSchedule() {
   const navigate = useNavigate();
@@ -25,11 +28,28 @@ export function CreateSchedule() {
       .number()
       .typeError('Seleccione una sucursal')
       .required('La sucursal es requerida'),
-    schedule_date: yup
+    //Rango de fechas: se crea un horario por cada día del rango que caiga en los días marcados
+    start_date: yup
       .string()
-      .required('La fecha es requerida')
+      .required('La fecha inicial es requerida')
       //Validador propio (.test): la fecha no puede ser anterior a hoy
-      .test('fecha-no-pasada', 'La fecha no puede ser anterior a hoy', (value) => !value || value >= today),
+      .test('fecha-no-pasada', 'La fecha inicial no puede ser anterior a hoy', (value) => !value || value >= today),
+    end_date: yup
+      .string()
+      .required('La fecha final es requerida')
+      //this.parent son los demás campos: se compara con la fecha inicial
+      .test('fecha-final', 'La fecha final debe ser igual o posterior a la inicial', function (value) {
+        return !value || !this.parent.start_date || value >= this.parent.start_date;
+      })
+      //Máximo 3 meses por rango (igual que en el API)
+      .test('maximo-3-meses', 'El rango puede ser de máximo 3 meses', function (value) {
+        return (
+          !value ||
+          !this.parent.start_date ||
+          differenceInCalendarDays(parseISO(value), parseISO(this.parent.start_date)) <= 92
+        );
+      }),
+    weekdays: yup.array().min(1, 'Seleccione al menos un día de la semana'),
     start_time: yup.string().required('La hora inicial es requerida'),
     end_time: yup
       .string()
@@ -42,11 +62,15 @@ export function CreateSchedule() {
   const {
     control,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm({
     defaultValues: {
       branch_id: '',
-      schedule_date: '',
+      start_date: '',
+      end_date: '',
+      //Por defecto de lunes a viernes
+      weekdays: [1, 2, 3, 4, 5],
       start_time: '',
       end_time: '',
     },
@@ -59,6 +83,22 @@ export function CreateSchedule() {
   // Si ocurre error al realizar el submit
   const onError = (errors, e) => console.log(errors, e);
 
+  //Vista previa en tiempo real: fechas que se van a crear (mismo cálculo que hace el API)
+  const [startDate, endDate, weekdays] = watch(['start_date', 'end_date', 'weekdays']);
+  const rangeOk =
+    Boolean(startDate) &&
+    Boolean(endDate) &&
+    endDate >= startDate &&
+    differenceInCalendarDays(parseISO(endDate), parseISO(startDate)) <= 92;
+  //eachDayOfInterval: todos los días del rango; getISODay: 1 (lunes) a 7 (domingo)
+  const dates = rangeOk
+    ? eachDayOfInterval({ start: parseISO(startDate), end: parseISO(endDate) }).filter((day) =>
+        weekdays.includes(getISODay(day)),
+      )
+    : [];
+  //Fecha corta en español para la vista previa: 'lun 07/12'
+  const shortDate = (day) => format(day, 'EEE dd/MM', { locale: es });
+
   // Accion submit
   const onSubmit = (DataForm) => {
     console.log('Formulario:');
@@ -69,10 +109,15 @@ export function CreateSchedule() {
         .then((response) => {
           //Respuesta al usuario
           if (response.data != null) {
+            //El API devuelve la lista de horarios creados (uno por fecha)
+            const first = response.data[0];
+            const last = response.data[response.data.length - 1];
             toast.success(
-              `Horario creado #${response.data.id} - ${response.data.branch} ${response.data.date_text} de ${response.data.start_time} a ${response.data.end_time}`,
+              response.data.length === 1
+                ? `Horario creado - ${first.branch} ${first.date_text} de ${first.start_time} a ${first.end_time}`
+                : `Se crearon ${response.data.length} horarios - ${first.branch} del ${first.date_text} al ${last.date_text} de ${first.start_time} a ${first.end_time}`,
               {
-                duration: 4000,
+                duration: 5000,
                 position: 'top-center',
               },
             );
@@ -119,7 +164,7 @@ export function CreateSchedule() {
         <Grid container spacing={1}>
           <Grid size={12}>
             <Typography variant="h5" gutterBottom>
-              Crear Horario
+              Crear Horarios por rango de fechas
             </Typography>
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
@@ -137,24 +182,65 @@ export function CreateSchedule() {
               </FormHelperText>
             </FormControl>
           </Grid>
-          <Grid size={{ xs: 12, sm: 6 }}>
+          <Grid size={{ xs: 12, sm: 3 }}>
             <FormControl variant="standard" fullWidth sx={{ m: 1 }}>
-              {/* Controlador y entrada de formulario de la fecha */}
               <Controller
-                name="schedule_date"
+                name="start_date"
                 control={control}
                 render={({ field }) => (
                   <TextField
                     {...field}
-                    id="schedule_date"
-                    label="Fecha"
+                    id="start_date"
+                    label="Desde"
                     type="date"
                     slotProps={{ inputLabel: { shrink: true }, htmlInput: { min: today } }}
-                    error={Boolean(errors.schedule_date)}
-                    helperText={errors.schedule_date ? errors.schedule_date.message : ' '}
+                    error={Boolean(errors.start_date)}
+                    helperText={errors.start_date ? errors.start_date.message : ' '}
                   />
                 )}
               />
+            </FormControl>
+          </Grid>
+          <Grid size={{ xs: 12, sm: 3 }}>
+            <FormControl variant="standard" fullWidth sx={{ m: 1 }}>
+              <Controller
+                name="end_date"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    id="end_date"
+                    label="Hasta"
+                    type="date"
+                    slotProps={{ inputLabel: { shrink: true }, htmlInput: { min: startDate || today } }}
+                    error={Boolean(errors.end_date)}
+                    helperText={errors.end_date ? errors.end_date.message : ' '}
+                  />
+                )}
+              />
+            </FormControl>
+          </Grid>
+          <Grid size={12}>
+            <FormControl variant="standard" fullWidth sx={{ m: 1 }}>
+              <Controller
+                name="weekdays"
+                control={control}
+                render={({ field }) => <SelectWeekdays field={field} />}
+              />
+              <FormHelperText sx={{ color: '#d32f2f' }}>
+                {errors.weekdays ? errors.weekdays.message : ' '}
+              </FormHelperText>
+              {/* Vista previa: cuántos horarios se van a crear y en qué fechas */}
+              {rangeOk && (
+                <Typography variant="body2" color={dates.length > 0 ? 'text.secondary' : '#d32f2f'}>
+                  {dates.length === 0
+                    ? 'Ninguna fecha del rango cae en los días marcados'
+                    : `Se van a crear ${dates.length} horarios: ` +
+                      (dates.length <= 6
+                        ? dates.map(shortDate).join(', ')
+                        : `${dates.slice(0, 3).map(shortDate).join(', ')} ... ${shortDate(dates[dates.length - 1])}`)}
+                </Typography>
+              )}
             </FormControl>
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
